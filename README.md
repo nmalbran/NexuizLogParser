@@ -44,7 +44,6 @@ The results given by the `NexuizLogParser.get_results()` function follow this fo
                               'color': string,
                               'caps': int,
                               'score': int,
-
                    },
                    team2_id: {...},
          },
