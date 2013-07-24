@@ -318,7 +318,7 @@ class NexuizLogParser:
                       'steal': 'STEALS',
                       'pickup': 'PICKUPS',
                       'teams': 'TEAM'}
-        for (player_id, player) in players.items():
+        for player in sorted(players.values(), key= lambda x: x['name']):
             self._display_player_scores(player, display_bot)
 
 
