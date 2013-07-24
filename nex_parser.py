@@ -261,14 +261,25 @@ class NexuizLogParser:
 
     def _compute_total(self):
         stats = ['frags', 'suicide', 'accident', 'tk', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']
+        stats_by_player = ['kills_by_player', 'deaths_by_player']
         for game in self.games.values():
-            for player in game['players'].values():
+            players = game['players'].values()
+            players_id = dict([(p['id'], p['name']) for p in players])
+
+            for player in players:
                 pname = player['name']
                 if pname not in self.total:
                     self.total[pname] = {'name': pname, 'team': []}
 
                 for stat in stats:
                     self.total[pname][stat] = self.total[pname].get(stat, 0) + player[stat]
+
+                for stat in stats_by_player:
+                    if stat not in self.total[pname]:
+                        self.total[pname][stat] = dict()
+
+                    for pid, num in player[stat].items():
+                        self.total[pname][stat][players_id[pid]] = self.total[pname][stat].get(players_id[pid], 0) + num
 
 
     def display_games_scores(self, display_bot=False):
@@ -344,7 +355,7 @@ class NexuizLogParser:
                 continue
             players[p_id] = p['name']
 
-        order = players.keys()
+        order = sorted(players.keys())
 
         cwidth = self.longest_name_length_bot if display_bot else self.longest_name_length
         strf = ("  %"+str(cwidth)+"s") * (len(players)+1)
@@ -364,6 +375,7 @@ class NexuizLogParser:
         print "   TOTAL"
         print SEP
         self._display_players_scores(self.total, display_bot)
+        self.display_kills_by_player(self.total, display_bot)
         print SEP
 
 
