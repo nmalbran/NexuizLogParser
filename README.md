@@ -60,6 +60,15 @@ The results given by the `NexuizLogParser.get_results()` function follow this fo
                                   'accident': int,
                                   'tk': int,
 
+                                  'kills_by_player': {
+                                                      player2_id: int,
+                                                      player3_id: int,
+                                  },
+                                  'deaths_by_player': {
+                                                      player2_id: int,
+                                                      player3_id: int,
+                                  },
+
                                   'capture': int,
                                   'return': int,
                                   'steal': int,

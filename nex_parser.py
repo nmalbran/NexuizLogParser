@@ -129,6 +129,9 @@ class NexuizLogParser:
                                                                         'accident': 0,
                                                                         'tk': 0,
 
+                                                                        'kills_by_player': dict(),
+                                                                        'deaths_by_player': dict(),
+
                                                                         'capture': 0,
                                                                         'return': 0,
                                                                         'steal': 0,
@@ -149,6 +152,9 @@ class NexuizLogParser:
                     other_data = command[4:] # items=killer weapon, victimitems=killed weapon
                     if text == "frag":         # kill other player
                         self.games[self.count]['players'][killer]['frags'] += 1
+                        self.games[self.count]['players'][killer]['kills_by_player'][killed] = self.games[self.count]['players'][killer]['kills_by_player'].get(killed, 0) + 1
+                        self.games[self.count]['players'][killed]['deaths_by_player'][killer] = self.games[self.count]['players'][killed]['deaths_by_player'].get(killer, 0) + 1
+
                     elif text == "suicide":    # kill himself, by weapon
                         self.games[self.count]['players'][killer]['suicide'] += 1
                     elif text == "accident":   # kill himself, not by weapon
