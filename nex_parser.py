@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+from optparse import OptionParser
+
+
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 SEP = "=" * 80
 
@@ -336,10 +339,13 @@ class NexuizLogParser:
 
 
 if __name__ == '__main__':
-    import sys
     from players import KNOWN_PLAYER_NICKS
 
+    parser = OptionParser()
+    parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results [False]", default=False)
+    (options, args) = parser.parse_args()
+
     nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
-    nlp.parse_log(sys.argv[1])
-    nlp.display_games_scores(display_bot=False)
+    nlp.parse_log(args[0])
+    nlp.display_games_scores(display_bot=options.bot)
     nlp.display_parser_info()
