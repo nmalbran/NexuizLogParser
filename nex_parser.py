@@ -19,8 +19,11 @@ class NexuizLogParser:
         self.longest_name_length = max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)])
         fcl = str(max(self.longest_name_length, 4) + 1)
         fcl_bot = str(max(self.longest_name_length_bot, 4) + 1)
-        self.STR_FORMAT = "%(name)"+ fcl + "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)3s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"
-        self.STR_FORMAT_BOT = "%(name)"+ fcl_bot + "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)3s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"
+
+        STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)3s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"]
+
+        self.str_format = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]
+        self.str_format_bot = STR_FORMAT_BASE[0] + fcl_bot + STR_FORMAT_BASE[1]
 
 
     def reset(self):
@@ -290,7 +293,7 @@ class NexuizLogParser:
 
 
     def _display_players_scores(self, players, display_bot=False):
-        strf = self.STR_FORMAT_BOT if display_bot else self.STR_FORMAT
+        strf = self.str_format_bot if display_bot else self.str_format
         print strf % {'name': 'NICK',
                       'frags': 'FRAGS',
                       'suicide': 'SUICIDES',
@@ -309,7 +312,7 @@ class NexuizLogParser:
             return
         player['teams'] = ', '.join(player['team'])
 
-        strf = self.STR_FORMAT_BOT if display_bot else self.STR_FORMAT
+        strf = self.str_format_bot if display_bot else self.str_format
         print strf % player
 
 
