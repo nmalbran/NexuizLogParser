@@ -27,33 +27,65 @@ The same person can have different nicknames in one log file. To solve that, the
         }
 
 ### Result format
-The results given by the `NexuizLogParser.get_results()` function follow this format:
+The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.get_total()` functions follow this format:
 
-    {
-     0: {
-         'map_data': {
-                      'map_name': string,
-                      'start_time': datetime.datetime,
-                      'end_time': datetime.datetime,
-                      'duration': 'H:MM:SS',
-                      'game_type': string,
-         },
-         'teams': {
-                   team1_id: {
-                              'id': team1_id,
-                              'color': string,
-                              'caps': int,
-                              'score': int,
-                   },
-                   team2_id: {...},
-         },
-         'players': {
-                     player1_id: {
-                                  'id': player1_id,
-                                  'ip': string,
-                                  'nick': string,
+    get_results() = {
+                     0: {
+                         'map_data': {
+                                      'map_name': string,
+                                      'start_time': datetime.datetime,
+                                      'end_time': datetime.datetime,
+                                      'duration': 'H:MM:SS',
+                                      'game_type': string,
+                         },
+                         'teams': {
+                                   team1_id: {
+                                              'id': team1_id,
+                                              'color': string,
+                                              'caps': int,
+                                              'score': int,
+                                   },
+                                   team2_id: {...},
+                         },
+                         'players': {
+                                     player1_id: {
+                                                  'id': player1_id,
+                                                  'ip': string,
+                                                  'nick': string,
+                                                  'name': string,
+                                                  'team': ['<team_color> (H:MM:SS)', ...],
+
+                                                  'frags': int,
+                                                  'suicide': int,
+                                                  'accident': int,
+                                                  'tk': int,
+                                                  'deaths': int,
+
+                                                  'kills_by_player': {
+                                                                      player2_id: int,
+                                                                      player3_id: int,
+                                                  },
+                                                  'deaths_by_player': {
+                                                                      player2_id: int,
+                                                                      player3_id: int,
+                                                  },
+
+                                                  'capture': int,
+                                                  'return': int,
+                                                  'steal': int,
+                                                  'dropped': int,
+                                                  'pickup': int,
+                                     },
+                                     player2_id: {...},
+                         }
+                     },
+                     1: {...},
+                    }
+
+    get_total() = {
+                   player1_name: {
                                   'name': string,
-                                  'team': ['<team_color> (H:MM:SS)', ...],
+                                  'team': [],
 
                                   'frags': int,
                                   'suicide': int,
@@ -62,12 +94,12 @@ The results given by the `NexuizLogParser.get_results()` function follow this fo
                                   'deaths': int,
 
                                   'kills_by_player': {
-                                                      player2_id: int,
-                                                      player3_id: int,
+                                                      player1_name: int,
+                                                      player2_name: int,
                                   },
                                   'deaths_by_player': {
-                                                      player2_id: int,
-                                                      player3_id: int,
+                                                      player1_name: int,
+                                                      player2_name: int,
                                   },
 
                                   'capture': int,
@@ -75,12 +107,9 @@ The results given by the `NexuizLogParser.get_results()` function follow this fo
                                   'steal': int,
                                   'dropped': int,
                                   'pickup': int,
-                     },
-                     player2_id: {...},
-         }
-     },
-     1: {...},
-    }
+                   },
+                   player2_name: {...},
+                  }
 
 *Notes*:
 

@@ -61,6 +61,13 @@ class NexuizLogParser:
         return self.games
 
 
+    def get_total(self):
+        """
+            Return a dictionary with summary of all games in the log.
+        """
+        return self.total
+
+
     def parse_log(self, logfile):
         """
             Parse the log in `logfile`.
