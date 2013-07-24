@@ -20,7 +20,7 @@ class NexuizLogParser:
         fcl = str(max(self.longest_name_length, 4) + 1)
         fcl_bot = str(max(self.longest_name_length_bot, 4) + 1)
 
-        STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)3s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"]
+        STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)3s  %(deaths)6s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"]
 
         self.str_format = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]
         self.str_format_bot = STR_FORMAT_BASE[0] + fcl_bot + STR_FORMAT_BASE[1]
@@ -137,6 +137,7 @@ class NexuizLogParser:
                                                                         'suicide': 0,
                                                                         'accident': 0,
                                                                         'tk': 0,
+                                                                        'deaths': 0,
 
                                                                         'kills_by_player': dict(),
                                                                         'deaths_by_player': dict(),
@@ -159,6 +160,8 @@ class NexuizLogParser:
                 elif command_name == "kill":
                     text, killer, killed = command[1:4]
                     other_data = command[4:] # items=killer weapon, victimitems=killed weapon
+                    self.games[self.count]['players'][killed]['deaths'] += 1
+
                     if text == "frag":         # kill other player
                         self.games[self.count]['players'][killer]['frags'] += 1
                         self.games[self.count]['players'][killer]['kills_by_player'][killed] = self.games[self.count]['players'][killer]['kills_by_player'].get(killed, 0) + 1
@@ -257,7 +260,7 @@ class NexuizLogParser:
         self._compute_total()
 
     def _compute_total(self):
-        stats = ['frags', 'suicide', 'accident', 'tk', 'capture', 'return', 'steal', 'dropped', 'pickup']
+        stats = ['frags', 'suicide', 'accident', 'tk', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']
         for game in self.games.values():
             for player in game['players'].values():
                 pname = player['name']
@@ -299,6 +302,7 @@ class NexuizLogParser:
                       'suicide': 'SUICIDES',
                       'accident': 'ACCIDENTS',
                       'tk': 'TK',
+                      'deaths': 'DEATHS',
                       'capture': 'CAPS',
                       'steal': 'STEALS',
                       'pickup': 'PICKUPS',

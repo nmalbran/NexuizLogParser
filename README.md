@@ -59,6 +59,7 @@ The results given by the `NexuizLogParser.get_results()` function follow this fo
                                   'suicide': int,
                                   'accident': int,
                                   'tk': int,
+                                  'deaths': int,
 
                                   'kills_by_player': {
                                                       player2_id: int,
