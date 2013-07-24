@@ -2,6 +2,8 @@
 
 from datetime import datetime
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
+SEP = "=" * 80
+
 
 class NexuizLogParser:
 
@@ -10,10 +12,10 @@ class NexuizLogParser:
         self.known_player_nicks = known_player_nicks
         self.teams = teams
 
-        longest_name_length_bot = max([len(p) for p in known_player_nicks.keys()])
-        longest_name_length = max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)])
-        fcl = str(max(longest_name_length, 4) + 1)
-        fcl_bot = str(max(longest_name_length_bot, 4) + 1)
+        self.longest_name_length_bot = max([len(p) for p in known_player_nicks.keys()])
+        self.longest_name_length = max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)])
+        fcl = str(max(self.longest_name_length, 4) + 1)
+        fcl_bot = str(max(self.longest_name_length_bot, 4) + 1)
         self.STR_FORMAT = "%(name)"+ fcl + "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)3s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"
         self.STR_FORMAT_BOT = "%(name)"+ fcl_bot + "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)3s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"
 
@@ -252,22 +254,22 @@ class NexuizLogParser:
             @display_bot: if set, it display bot results.
         """
         for (game_id, game) in self.games.items():
-            self._display_game_scores(game, display_bot)
+            self.display_game_scores(game, display_bot)
 
 
-    def _display_game_scores(self, game, display_bot=False):
-        sep = "=" * 80
-        print sep
+    def display_game_scores(self, game, display_bot=False):
+        print SEP
         print " MAP: %s  TYPE: %s  DATE: %s  DURATION: %s" % (game['map_data']['map_name'], game['map_data']['game_type'], game['map_data']['start_time'], game['map_data']['duration'])
-        print sep
+        print SEP
         if 'players' in game:
             self._display_players_scores(game['players'], display_bot)
+            self.display_kills_by_player_by_game(game, display_bot)
         else:
             print 'No Players'
 
         if 'teams' in game and game['map_data']['game_type'] == 'ctf':
             self._display_teams_scores(game['teams'])
-        print sep
+        print SEP
 
 
     def _display_players_scores(self, players, display_bot=False):
@@ -309,6 +311,28 @@ class NexuizLogParser:
         print "\nPARSER INFO:"
         for e in self.info:
             print e
+
+
+    def display_kills_by_player_by_game(self, game, display_bot=False):
+        players = dict()
+        for p_id, p in game['players'].items():
+            if not display_bot and self.is_bot(p['name']):
+                continue
+            players[p_id] = p['name']
+
+        order = players.keys()
+
+        cwidth = self.longest_name_length_bot if display_bot else self.longest_name_length
+        strf = ("  %"+str(cwidth)+"s") * (len(players)+1)
+
+        print ""
+        print strf % tuple(['KILLER']+[players[p] for p in order])
+        for killer in order:
+            line = [players[killer]]
+            for killed in order:
+                line.append(game['players'][killer]['kills_by_player'].get(killed, 0))
+            print strf % tuple(line)
+        print ""
 
 
 if __name__ == '__main__':
