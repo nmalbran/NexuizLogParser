@@ -83,7 +83,7 @@ class NexuizLogParser:
 
                     self.games[self.count]['teams'] = dict()
                     for (t_id, team) in self.teams.items():
-                        self.games[self.count]['teams'][t_id] = {'id': t_id, 'color': team, 'caps': '0', 'score': '0'}
+                        self.games[self.count]['teams'][t_id] = {'id': t_id, 'color': team, 'caps': 0, 'score': 0}
 
                 elif not self.in_game:
                     # commands outside a game are discarded
@@ -206,8 +206,8 @@ class NexuizLogParser:
                     team_id = command[3]
                     if team_id in self.teams and team_stats:
                         caps, score = team_stats.split(',')
-                        self.games[self.count]['teams'][team_id]['caps'] = caps
-                        self.games[self.count]['teams'][team_id]['score'] = score
+                        self.games[self.count]['teams'][team_id]['caps'] = int(caps)
+                        self.games[self.count]['teams'][team_id]['score'] = int(score)
 
                 elif command_name == "end":
                     self.games[self.count]['map_data']['end_time'] = gametime
