@@ -34,6 +34,7 @@ class NexuizLogParser:
         self.game_type = 'ctf'
         self.player_nicks = set()
         self.info = []
+        self.total = dict()
 
 
     def is_bot(self, name):
@@ -250,6 +251,19 @@ class NexuizLogParser:
                     self.info.append('main command not recognized (line %d):' % line_number)
                     self.info.append(command)
 
+        self._compute_total()
+
+    def _compute_total(self):
+        stats = ['frags', 'suicide', 'accident', 'tk', 'capture', 'return', 'steal', 'dropped', 'pickup']
+        for game in self.games.values():
+            for player in game['players'].values():
+                pname = player['name']
+                if pname not in self.total:
+                    self.total[pname] = {'name': pname, 'team': []}
+
+                for stat in stats:
+                    self.total[pname][stat] = self.total[pname].get(stat, 0) + player[stat]
+
 
     def display_games_scores(self, display_bot=False):
         """
@@ -266,7 +280,7 @@ class NexuizLogParser:
         print SEP
         if 'players' in game:
             self._display_players_scores(game['players'], display_bot)
-            self.display_kills_by_player_by_game(game, display_bot)
+            self.display_kills_by_player(game['players'], display_bot)
         else:
             print 'No Players'
 
@@ -316,9 +330,9 @@ class NexuizLogParser:
             print e
 
 
-    def display_kills_by_player_by_game(self, game, display_bot=False):
+    def display_kills_by_player(self, game_players, display_bot=False):
         players = dict()
-        for p_id, p in game['players'].items():
+        for p_id, p in game_players.items():
             if not display_bot and self.is_bot(p['name']):
                 continue
             players[p_id] = p['name']
@@ -333,9 +347,17 @@ class NexuizLogParser:
         for killer in order:
             line = [players[killer]]
             for killed in order:
-                line.append(game['players'][killer]['kills_by_player'].get(killed, 0))
+                line.append(game_players[killer]['kills_by_player'].get(killed, 0))
             print strf % tuple(line)
         print ""
+
+
+    def display_total(self, display_bot=False):
+        print SEP
+        print "   TOTAL"
+        print SEP
+        self._display_players_scores(self.total, display_bot)
+        print SEP
 
 
 if __name__ == '__main__':
@@ -343,9 +365,14 @@ if __name__ == '__main__':
 
     parser = OptionParser()
     parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results [False]", default=False)
+    parser.add_option("--nototal", action="store_false", dest='total', help="Don't display totals", default=True)
+    parser.add_option("--noparcial", action="store_false", dest='parcial', help="Don't display individual game results", default=True)
     (options, args) = parser.parse_args()
 
     nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
     nlp.parse_log(args[0])
-    nlp.display_games_scores(display_bot=options.bot)
+    if options.parcial:
+        nlp.display_games_scores(display_bot=options.bot)
+    if options.total:
+        nlp.display_total(display_bot=options.bot)
     nlp.display_parser_info()
