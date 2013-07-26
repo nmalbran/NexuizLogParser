@@ -379,7 +379,7 @@ class NexuizLogParser:
 
     def display_total(self, display_bot=False):
         print SEP
-        print "   TOTAL"
+        print "   TOTAL  N° JUEGOS: %s" % len(self.games)
         print SEP
         self._display_players_scores(self.total, display_bot)
         self.display_kills_by_player(self.total, display_bot)
