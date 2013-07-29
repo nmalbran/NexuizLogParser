@@ -270,6 +270,8 @@ class NexuizLogParser:
         stats = ['frags', 'suicide', 'accident', 'tk', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']
         stats_by_player = ['kills_by_player', 'deaths_by_player']
         for game in self.games.values():
+            if 'players' not in game:
+                continue
             players = game['players'].values()
             players_id = dict([(p['id'], p['name']) for p in players])
 
