@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from optparse import OptionParser
-
+from weapons import WEAPONS, WEAPON_MOD
 
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 SEP = "=" * 80
@@ -168,6 +168,23 @@ class NexuizLogParser:
                     text, killer, killed = command[1:4]
                     other_data = command[4:] # items=killer weapon, victimitems=killed weapon
                     self.games[self.count]['players'][killed]['deaths'] += 1
+
+                    # killer_weapon = other_data[1][6:]
+                    # killer_weapon_id = ''
+                    # killer_weapon_mod = ''
+                    # for c in killer_weapon:
+                    #     try:
+                    #         int(c)
+                    #         killer_weapon_id += c
+                    #     except ValueError as e:
+                    #         killer_weapon_mod += c
+
+                    # if killer_weapon_id not in WEAPONS:
+                    #     print self.line_number, str(killer_weapon)
+
+                    # for m in killer_weapon_mod:
+                    #     if m not in WEAPON_MOD:
+                    #         print self.line_number, str(killer_weapon)
 
                     if text == "frag":         # kill other player
                         self.games[self.count]['players'][killer]['frags'] += 1
