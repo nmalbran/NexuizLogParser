@@ -147,6 +147,7 @@ class NexuizLogParser:
 
                                                                         'kills_by_player': dict(),
                                                                         'deaths_by_player': dict(),
+                                                                        'kills_by_weapon': dict(),
 
                                                                         'capture': 0,
                                                                         'return': 0,
@@ -172,6 +173,7 @@ class NexuizLogParser:
                     if text in ['frag', 'tk']:
                         killed_weapon, killed_mod = self._parse_weapon(other_data[2][12:])
 
+                    self.games[self.count]['players'][killer]['kills_by_weapon'][killer_weapon] = self.games[self.count]['players'][killer]['kills_by_weapon'].get(killer_weapon, 0) + 1
 
                     if text == "frag":         # kill other player
                         self.games[self.count]['players'][killer]['frags'] += 1
@@ -286,7 +288,7 @@ class NexuizLogParser:
             for player in players:
                 pname = player['name']
                 if pname not in self.total:
-                    self.total[pname] = {'name': pname, 'team': []}
+                    self.total[pname] = {'name': pname, 'team': [], 'kills_by_weapon': dict()}
 
                 for stat in stats:
                     self.total[pname][stat] = self.total[pname].get(stat, 0) + player[stat]
@@ -297,6 +299,10 @@ class NexuizLogParser:
 
                     for pid, num in player[stat].items():
                         self.total[pname][stat][players_id[pid]] = self.total[pname][stat].get(players_id[pid], 0) + num
+
+
+                for weapon, num in player['kills_by_weapon'].items():
+                    self.total[pname]['kills_by_weapon'][weapon] = self.total[pname]['kills_by_weapon'].get(weapon, 0) + num
 
     def _parse_weapon(self, weapon):
         weapon_id = ''

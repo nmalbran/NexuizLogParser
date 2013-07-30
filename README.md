@@ -70,6 +70,10 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                                       player2_id: int,
                                                                       player3_id: int,
                                                   },
+                                                  'kills_by_weapon': {
+                                                                      weapon_name1: int,
+                                                                      weapon_name2: int,
+                                                  },
 
                                                   'capture': int,
                                                   'return': int,
@@ -102,6 +106,10 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'deaths_by_player': {
                                                       player1_name: int,
                                                       player2_name: int,
+                                  },
+                                  'kills_by_weapon': {
+                                                      weapon_name1: int,
+                                                      weapon_name2: int,
                                   },
 
                                   'capture': int,
