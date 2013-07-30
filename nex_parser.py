@@ -5,7 +5,7 @@ from optparse import OptionParser
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 SEP = "=" * 80
-STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(teams)s"]
+STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s"]
 
 
 class NexuizLogParser:
@@ -275,6 +275,7 @@ class NexuizLogParser:
                     self.info.append(command)
 
         self._clean_games()
+        self._compute_extra_stats()
         self._compute_total()
 
 
@@ -282,6 +283,12 @@ class NexuizLogParser:
         for i, game in self.games.items():
             if 'players' not in game:
                 del self.games[i]
+
+
+    def _compute_extra_stats(self):
+        for i, game in self.games.items():
+            for pid, player in game['players'].items():
+                self.games[i]['players'][pid]['pweapon'] = self.get_preffered_weapons(player['kills_by_weapon'])
 
 
     def _compute_total(self):
@@ -311,6 +318,7 @@ class NexuizLogParser:
 
                 for weapon, num in player['kills_by_weapon'].items():
                     self.total[pname]['kills_by_weapon'][weapon] = self.total[pname]['kills_by_weapon'].get(weapon, 0) + num
+                self.total[pname]['pweapon'] = self.get_preffered_weapons(self.total[pname]['kills_by_weapon'], 3)
 
 
     def _parse_weapon(self, weapon):
@@ -338,6 +346,11 @@ class NexuizLogParser:
                 clean_mod += m
 
         return (weapon_str, clean_mod)
+
+
+    def get_preffered_weapons(self, weapon_dict, num=2):
+        weapons = sorted(weapon_dict.items(), key=lambda x: x[1], reverse=True)[:num]
+        return ", ".join(["%s(%d)" % w for w in weapons])
 
 
     def display_games_scores(self, display_bot=False):
@@ -376,6 +389,7 @@ class NexuizLogParser:
                       'capture': 'CAPS',
                       'steal': 'STEALS',
                       'pickup': 'PICKUPS',
+                      'pweapon': 'Preffered Weapon',
                       'teams': 'TEAM'}
         for player in sorted(players.values(), key= lambda x: x['name']):
             self._display_player_scores(player, display_bot)

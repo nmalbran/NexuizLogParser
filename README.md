@@ -80,6 +80,8 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'steal': int,
                                                   'dropped': int,
                                                   'pickup': int,
+
+                                                  'pweapon': str,
                                      },
                                      player2_id: {...},
                          }
@@ -117,6 +119,8 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'steal': int,
                                   'dropped': int,
                                   'pickup': int,
+
+                                  'pweapon': str,
                    },
                    player2_name: {...},
                   }
