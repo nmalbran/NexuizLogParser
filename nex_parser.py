@@ -20,7 +20,7 @@ class NexuizLogParser:
         fcl = str(max(self.longest_name_length, 4) + 1)
         fcl_bot = str(max(self.longest_name_length_bot, 4) + 1)
 
-        STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)3s  %(deaths)6s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"]
+        STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)10s  %(deaths)6s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"]
 
         self.str_format = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]
         self.str_format_bot = STR_FORMAT_BASE[0] + fcl_bot + STR_FORMAT_BASE[1]
@@ -34,7 +34,6 @@ class NexuizLogParser:
         self.count = 0
         self.line_number = 0
         self.games = dict()
-        self.game_type = 'ctf'
         self.player_nicks = set()
         self.info = []
         self.total = dict()
@@ -75,9 +74,6 @@ class NexuizLogParser:
         for line in open(logfile):
             self.line_number += 1
 
-            if line[24:58] == 'Game type successfully switched to':
-                self.game_type = line[58:].strip()
-
             if (len(line) > 25) and (line[24] == ":"):
                 timestamp = line[3:22]
                 gametime = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
@@ -89,12 +85,16 @@ class NexuizLogParser:
                 ########################
                 command_name = command[0]
                 if command_name == "gamestart":
+                    underscore_pos = command[1].find('_')
+                    game_type = command[1][:underscore_pos]
+                    map_name = command[1][underscore_pos+1:]
+
                     self.in_game = True
                     self.games[self.count] = dict()
-                    self.games[self.count]['map_data'] = {'map_name': command[1],
+                    self.games[self.count]['map_data'] = {'map_name': map_name,
                                                           'start_time': gametime,
                                                           'duration': '',
-                                                          'game_type': self.game_type,
+                                                          'game_type': game_type,
                                                           }
 
                     self.games[self.count]['teams'] = dict()
@@ -338,7 +338,7 @@ class NexuizLogParser:
                       'frags': 'FRAGS',
                       'suicide': 'SUICIDES',
                       'accident': 'ACCIDENTS',
-                      'tk': 'TK',
+                      'tk': 'TEAM KILL',
                       'deaths': 'DEATHS',
                       'capture': 'CAPS',
                       'steal': 'STEALS',
