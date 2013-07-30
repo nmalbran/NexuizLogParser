@@ -2,10 +2,10 @@
 
 from datetime import datetime
 from optparse import OptionParser
-from weapons import WEAPONS, WEAPON_MOD
-
+from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 SEP = "=" * 80
+STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(teams)s"]
 
 
 class NexuizLogParser:
@@ -19,8 +19,6 @@ class NexuizLogParser:
         self.longest_name_length = max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)])
         fcl = str(max(self.longest_name_length, 4) + 1)
         fcl_bot = str(max(self.longest_name_length_bot, 4) + 1)
-
-        STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(suicide)8s  %(accident)9s  %(tk)10s  %(deaths)6s  %(steal)6s  %(capture)4s  %(pickup)7s  %(teams)s"]
 
         self.str_format = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]
         self.str_format_bot = STR_FORMAT_BASE[0] + fcl_bot + STR_FORMAT_BASE[1]
@@ -145,6 +143,7 @@ class NexuizLogParser:
                                                                         'accident': 0,
                                                                         'tk': 0,
                                                                         'deaths': 0,
+                                                                        'fckills': 0,
 
                                                                         'kills_by_player': dict(),
                                                                         'deaths_by_player': dict(),
@@ -169,27 +168,19 @@ class NexuizLogParser:
                     other_data = command[4:] # items=killer weapon, victimitems=killed weapon
                     self.games[self.count]['players'][killed]['deaths'] += 1
 
-                    # killer_weapon = other_data[1][6:]
-                    # killer_weapon_id = ''
-                    # killer_weapon_mod = ''
-                    # for c in killer_weapon:
-                    #     try:
-                    #         int(c)
-                    #         killer_weapon_id += c
-                    #     except ValueError as e:
-                    #         killer_weapon_mod += c
+                    killer_weapon, killer_mod = self._parse_weapon(other_data[1][6:])
+                    if text in ['frag', 'tk']:
+                        killed_weapon, killed_mod = self._parse_weapon(other_data[2][12:])
 
-                    # if killer_weapon_id not in WEAPONS:
-                    #     print self.line_number, str(killer_weapon)
-
-                    # for m in killer_weapon_mod:
-                    #     if m not in WEAPON_MOD:
-                    #         print self.line_number, str(killer_weapon)
 
                     if text == "frag":         # kill other player
                         self.games[self.count]['players'][killer]['frags'] += 1
                         self.games[self.count]['players'][killer]['kills_by_player'][killed] = self.games[self.count]['players'][killer]['kills_by_player'].get(killed, 0) + 1
                         self.games[self.count]['players'][killed]['deaths_by_player'][killer] = self.games[self.count]['players'][killed]['deaths_by_player'].get(killer, 0) + 1
+
+                        if FLAG in killed_mod:
+                            self.games[self.count]['players'][killer]['fckills'] += 1
+
 
                     elif text == "suicide":    # kill himself, by weapon
                         self.games[self.count]['players'][killer]['suicide'] += 1
@@ -284,7 +275,7 @@ class NexuizLogParser:
         self._compute_total()
 
     def _compute_total(self):
-        stats = ['frags', 'suicide', 'accident', 'tk', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']
+        stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']
         stats_by_player = ['kills_by_player', 'deaths_by_player']
         for game in self.games.values():
             if 'players' not in game:
@@ -307,6 +298,31 @@ class NexuizLogParser:
                     for pid, num in player[stat].items():
                         self.total[pname][stat][players_id[pid]] = self.total[pname][stat].get(players_id[pid], 0) + num
 
+    def _parse_weapon(self, weapon):
+        weapon_id = ''
+        weapon_mod = ''
+        for c in weapon:
+            try:
+                int(c)
+                weapon_id += c
+            except ValueError as e:
+                weapon_mod += c
+
+        weapon_id = int(weapon_id)
+        if weapon_id not in WEAPONS:
+            self.info.append("Unknown weapon id: Line Number: %d, Weapon: %s" % (self.line_number, weapon))
+            weapon_str = 'new weapon'
+        else:
+            weapon_str = WEAPONS[weapon_id]
+
+        clean_mod = ''
+        for m in weapon_mod:
+            if m not in WEAPON_MOD:
+                self.info.append("Unknown weapon mod: Line Number: %d, Weapon: %s" % (self.line_number, weapon))
+            else:
+                clean_mod += m
+
+        return (weapon_str, clean_mod)
 
     def display_games_scores(self, display_bot=False):
         """
@@ -339,6 +355,7 @@ class NexuizLogParser:
                       'suicide': 'SUICIDES',
                       'accident': 'ACCIDENTS',
                       'tk': 'TEAM KILL',
+                      'fckills': 'FC KILLS',
                       'deaths': 'DEATHS',
                       'capture': 'CAPS',
                       'steal': 'STEALS',

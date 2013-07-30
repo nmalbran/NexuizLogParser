@@ -56,10 +56,11 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'team': ['<team_color> (H:MM:SS)', ...],
 
                                                   'frags': int,
-                                                  'suicide': int,
-                                                  'accident': int,
+                                                  'fckills': int,
                                                   'tk': int,
                                                   'deaths': int,
+                                                  'suicide': int,
+                                                  'accident': int,
 
                                                   'kills_by_player': {
                                                                       player2_id: int,
@@ -88,10 +89,11 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'team': [],
 
                                   'frags': int,
-                                  'suicide': int,
-                                  'accident': int,
+                                  'fckills': int,
                                   'tk': int,
                                   'deaths': int,
+                                  'suicide': int,
+                                  'accident': int,
 
                                   'kills_by_player': {
                                                       player1_name: int,
