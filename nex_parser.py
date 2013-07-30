@@ -7,6 +7,19 @@ TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 SEP = "=" * 80
 STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s"]
 
+HEADER_NAMES = {'name': 'NAME',
+                'frags': 'FRAGS',
+                'suicide': 'SUICIDES',
+                'accident': 'ACCIDENTS',
+                'tk': 'TEAM KILL',
+                'fckills': 'FC KILLS',
+                'deaths': 'DEATHS',
+                'capture': 'CAPS',
+                'steal': 'STEALS',
+                'pickup': 'PICKUPS',
+                'pweapon': 'Preffered Weapon',
+                'teams': 'TEAM'}
+
 
 class NexuizLogParser:
 
@@ -379,18 +392,7 @@ class NexuizLogParser:
 
     def _display_players_scores(self, players, display_bot=False):
         strf = self.str_format_bot if display_bot else self.str_format
-        print strf % {'name': 'NICK',
-                      'frags': 'FRAGS',
-                      'suicide': 'SUICIDES',
-                      'accident': 'ACCIDENTS',
-                      'tk': 'TEAM KILL',
-                      'fckills': 'FC KILLS',
-                      'deaths': 'DEATHS',
-                      'capture': 'CAPS',
-                      'steal': 'STEALS',
-                      'pickup': 'PICKUPS',
-                      'pweapon': 'Preffered Weapon',
-                      'teams': 'TEAM'}
+        print strf % HEADER_NAMES
         for player in sorted(players.values(), key= lambda x: x['name']):
             self._display_player_scores(player, display_bot)
 
@@ -452,6 +454,32 @@ class NexuizLogParser:
         print SEP
 
 
+    def display_in_html(self, display_bot=False):
+        base_t = open('html_templates/base.html').read()
+        parcial_t = open('html_templates/parcial.html').read()
+        row_t = open('html_templates/row.html').read()
+
+        content = {'title': 'Nexuiz Stats', 'total_table': '', 'parcial_table':''}
+
+        table_row_header = row_t % dict(HEADER_NAMES, css='header')
+
+        for i, game in sorted(self.games.items(), key=lambda x: x[0]):
+            parcial_dict = dict(game['map_data'], player_stats=table_row_header, player_vs_player='')
+            for pid, player in game['players'].items():
+                if self.is_bot(player['name']) and not display_bot:
+                    continue
+                parcial_dict['player_stats'] += row_t % dict(player, css='', teams='')
+
+            content['parcial_table'] += parcial_t % parcial_dict
+
+
+
+
+        print base_t % content
+
+
+
+
 if __name__ == '__main__':
     from players import KNOWN_PLAYER_NICKS
 
@@ -459,12 +487,17 @@ if __name__ == '__main__':
     parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results [False]", default=False)
     parser.add_option("--nototal", action="store_false", dest='total', help="Don't display totals", default=True)
     parser.add_option("--noparcial", action="store_false", dest='parcial', help="Don't display individual game results", default=True)
+    parser.add_option("--html", action="store_true", dest='html', help="Print result in html", default=False)
     (options, args) = parser.parse_args()
 
     nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
     nlp.parse_log(args[0])
-    if options.parcial:
-        nlp.display_games_scores(display_bot=options.bot)
-    if options.total:
-        nlp.display_total(display_bot=options.bot)
-    nlp.display_parser_info()
+
+    if options.html:
+        nlp.display_in_html(display_bot=options.bot)
+    else:
+        if options.parcial:
+            nlp.display_games_scores(display_bot=options.bot)
+        if options.total:
+            nlp.display_total(display_bot=options.bot)
+        # nlp.display_parser_info()
