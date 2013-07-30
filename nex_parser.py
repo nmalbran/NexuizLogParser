@@ -274,7 +274,15 @@ class NexuizLogParser:
                     self.info.append('main command not recognized (line %d):' % line_number)
                     self.info.append(command)
 
+        self._clean_games()
         self._compute_total()
+
+
+    def _clean_games(self):
+        for i, game in self.games.items():
+            if 'players' not in game:
+                del self.games[i]
+
 
     def _compute_total(self):
         stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']
@@ -304,6 +312,7 @@ class NexuizLogParser:
                 for weapon, num in player['kills_by_weapon'].items():
                     self.total[pname]['kills_by_weapon'][weapon] = self.total[pname]['kills_by_weapon'].get(weapon, 0) + num
 
+
     def _parse_weapon(self, weapon):
         weapon_id = ''
         weapon_mod = ''
@@ -329,6 +338,7 @@ class NexuizLogParser:
                 clean_mod += m
 
         return (weapon_str, clean_mod)
+
 
     def display_games_scores(self, display_bot=False):
         """
