@@ -3,6 +3,8 @@
 from datetime import datetime
 from optparse import OptionParser
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
+from render import HTMLRender, PlainTextRender
+
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 SEP = "=" * 80
 STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s"]
@@ -454,28 +456,38 @@ class NexuizLogParser:
         print SEP
 
 
-    def display_in_html(self, display_bot=False):
-        base_t = open('html_templates/base.html').read()
-        parcial_t = open('html_templates/parcial.html').read()
-        row_t = open('html_templates/row.html').read()
+    def _filter_and_sort(self, players, display_bot=False):
+        def valid(player):
+            if self.is_bot(player['name']) and not display_bot:
+                return False
+            return True
 
-        content = {'title': 'Nexuiz Stats', 'total_table': '', 'parcial_table':''}
+        return sorted([p for p in players if valid(p)], key=lambda x: x['name'])
 
-        table_row_header = row_t % dict(HEADER_NAMES, css='header')
+    def _output_players_scores(self, render, players):
+        output = render.table_row_header()
+        for player in players:
+            player['teams'] = ', '.join(player['team'])
+            output += render.table_row_player(player)
+        return output
+
+
+    def output(self, output='html', display_bot=False):
+        options = {'html': HTMLRender, 'text': PlainTextRender}
+        if output not in options:
+            output = 'html'
+        render = options[output](header_names=HEADER_NAMES, display_bot=display_bot)
+
+        content = {'title': 'Nexuiz Stats', 'total_table': '', 'parcial_tables':''}
 
         for i, game in sorted(self.games.items(), key=lambda x: x[0]):
-            parcial_dict = dict(game['map_data'], player_stats=table_row_header, player_vs_player='')
-            for pid, player in game['players'].items():
-                if self.is_bot(player['name']) and not display_bot:
-                    continue
-                parcial_dict['player_stats'] += row_t % dict(player, css='', teams='')
+            parcial_dict = dict(game['map_data'], player_stats='', player_vs_player='')
+            parcial_dict['player_stats'] = self._output_players_scores(render, self._filter_and_sort(game['players'].values(), display_bot))
 
-            content['parcial_table'] += parcial_t % parcial_dict
+            content['parcial_tables'] += render.parcial_game(parcial_dict)
 
 
-
-
-        print base_t % content
+        return render.base(content)
 
 
 
@@ -494,7 +506,7 @@ if __name__ == '__main__':
     nlp.parse_log(args[0])
 
     if options.html:
-        nlp.display_in_html(display_bot=options.bot)
+        print nlp.output(display_bot=options.bot)
     else:
         if options.parcial:
             nlp.display_games_scores(display_bot=options.bot)
