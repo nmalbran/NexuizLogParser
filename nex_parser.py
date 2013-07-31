@@ -24,7 +24,7 @@ HEADER_NAMES = {'name': 'NAME',
 
                 'killervskilled': 'KILLER',
 
-                'color': 'COLOR',
+                'color': 'TEAMS',
                 'caps': 'CAPS',
                 'score': 'SCORE',
                 }

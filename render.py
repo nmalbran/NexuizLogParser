@@ -132,12 +132,13 @@ class PlainTextRender(BaseRender):
         return "\n   %(color)s  %(caps)s  %(score)s\n" % self.header_names
 
     def teams_table_row(self, team):
-        return "   %(color)5s  %(caps)4s  %(score)s" % team
+        return "   %(color)5s  %(caps)4s  %(score)s\n" % team
 
     def total(self, total_data):
         output  = SEP
         output += "   TOTAL  N° JUEGOS: %(game_number)s \n" % total_data
         output += SEP
         output += "%(player_stats)s \n%(player_vs_player)s\n" % total_data
+        output += SEP
 
         return output
