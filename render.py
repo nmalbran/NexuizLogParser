@@ -109,11 +109,11 @@ class PlainTextRender(BaseRender):
 
     def game(self, game_data):
         output  = SEP
-        output += " MAP: %(map_name)s  TYPE: %(game_type)s  DATE: %(start_time)s  DURATION: %(duration)s \n"
+        output += " MAP: %(map_name)s  TYPE: %(game_type)s  DATE: %(start_time)s  DURATION: %(duration)s\n"
         output += SEP
-        output += "%(player_stats)s \n"
-        output += "%(player_vs_player)s \n"
-        output += "%(teams_stats)s \n"
+        output += "%(player_stats)s\n"
+        output += "%(player_vs_player)s\n"
+        output += "%(teams_stats)s\n"
         output += SEP
         return output % game_data
 
@@ -136,7 +136,7 @@ class PlainTextRender(BaseRender):
 
     def total(self, total_data):
         output  = SEP
-        output += "   TOTAL  N° JUEGOS: %(game_number)s \n" % total_data
+        output += "   TOTAL  N° JUEGOS: %(game_number)s\n" % total_data
         output += SEP
         output += "%(player_stats)s \n%(player_vs_player)s\n" % total_data
         output += SEP
