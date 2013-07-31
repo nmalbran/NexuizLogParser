@@ -478,13 +478,15 @@ class NexuizLogParser:
             output = 'html'
         render = options[output](header_names=HEADER_NAMES, display_bot=display_bot)
 
-        content = {'title': 'Nexuiz Stats', 'total_table': '', 'parcial_tables':''}
+        content = {'title': 'Nexuiz Stats', 'total_table': '', 'games_tables':''}
 
         for i, game in sorted(self.games.items(), key=lambda x: x[0]):
-            parcial_dict = dict(game['map_data'], player_stats='', player_vs_player='')
-            parcial_dict['player_stats'] = self._output_players_scores(render, self._filter_and_sort(game['players'].values(), display_bot))
+            game_data = game['map_data']
+            game_data['player_stats'] = self._output_players_scores(render, self._filter_and_sort(game['players'].values(), display_bot))
+            game_data['player_vs_player'] = ''
 
-            content['parcial_tables'] += render.parcial_game(parcial_dict)
+
+            content['games_tables'] += render.game(game_data)
 
 
         return render.base(content)
