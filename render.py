@@ -32,6 +32,16 @@ class BaseRender(object):
         """
         return ''
 
+    def total(self, total_data):
+        """
+            Expect: total_data = {
+                                'game_number': '',
+                                'player_stats': '',
+                                'player_vs_player': '',
+            }
+        """
+        return ''
+
 class HTMLRender(BaseRender):
 
     def __init__(self, header_names, display_bot=False):
@@ -40,6 +50,7 @@ class HTMLRender(BaseRender):
         self.game_t = open(TEMPLATE_FOLDER + 'game.html').read()
         self.player_row_t = open(TEMPLATE_FOLDER + 'player_row.html').read()
         self.team_row_t = open(TEMPLATE_FOLDER + 'team_row.html').read()
+        self.total_t = open(TEMPLATE_FOLDER + 'total.html').read()
         self.header_css = 'header'
 
 
@@ -70,8 +81,12 @@ class HTMLRender(BaseRender):
     def teams_table_row(self, team):
         return self.team_row_t % dict(team, css='')
 
+    def total(self, total_data):
+        return self.total_t % total_data
+
     def _standard_row(self, data, css=''):
         return "<tr class='%s'>%s</tr>" % (css, ''.join(["<td>%s</td>" % d for d in data]))
+
 
 class PlainTextRender(BaseRender):
 

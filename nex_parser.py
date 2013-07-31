@@ -479,11 +479,16 @@ class NexuizLogParser:
         return output
 
     def _output_kills_by_player(self, render, players):
+        if 'id' in players[0]:
+            key = 'id'
+        else:
+            key= 'name'
+
         output = render.kills_by_player_header([p['name'] for p in players])
         for killer in players:
             line = [killer['name']]
             for killed in players:
-                line.append(killer['kills_by_player'].get(killed['id'], 0))
+                line.append(killer['kills_by_player'].get(killed[key], 0))
             output += render.kills_by_player_row(line)
         return output
 
@@ -515,10 +520,15 @@ class NexuizLogParser:
 
             content['games_tables'] += render.game(game_data)
 
+        total_players = self._filter_and_sort(self.total.values(), display_bot)
+        total_data = {
+                'game_number': len(self.games),
+                'player_stats': self._output_players_scores(render, total_players),
+                'player_vs_player': self._output_kills_by_player(render, total_players),
+        }
+        content['total_table'] = render.total(total_data)
 
         return render.base(content)
-
-
 
 
 if __name__ == '__main__':
