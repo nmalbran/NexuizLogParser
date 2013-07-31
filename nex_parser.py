@@ -20,7 +20,9 @@ HEADER_NAMES = {'name': 'NAME',
                 'steal': 'STEALS',
                 'pickup': 'PICKUPS',
                 'pweapon': 'Preffered Weapon',
-                'teams': 'TEAM'}
+                'teams': 'TEAM',
+                'killervskilled': 'KILLER',
+                }
 
 
 class NexuizLogParser:
@@ -472,7 +474,13 @@ class NexuizLogParser:
         return output
 
     def _output_kills_by_player(self, render, players):
-        return ''
+        output = render.kills_by_player_header([p['name'] for p in players])
+        for killer in players:
+            line = [killer['name']]
+            for killed in players:
+                line.append(killer['kills_by_player'].get(killed['id'], 0))
+            output += render.kills_by_player_row(line)
+        return output
 
 
     def output(self, output='html', display_bot=False):
