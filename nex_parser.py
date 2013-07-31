@@ -37,13 +37,17 @@ class NexuizLogParser:
         self.known_player_nicks = known_player_nicks
         self.teams = teams
 
-        self.longest_name_length_bot = max([len(p) for p in known_player_nicks.keys()])
-        self.longest_name_length = max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)])
-        fcl = str(max(self.longest_name_length, 4) + 1)
-        fcl_bot = str(max(self.longest_name_length_bot, 4) + 1)
+        self.longest_name_length = {
+            True: max([len(p) for p in known_player_nicks.keys()]), # display_bot = True
+            False: max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)]), # display_bot = False
+        }
+        # self.longest_name_length_bot = max([len(p) for p in known_player_nicks.keys()])
+        # self.longest_name_length = max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)])
+        # fcl = str(max(self.longest_name_length, 4) + 1)
+        # fcl_bot = str(max(self.longest_name_length_bot, 4) + 1)
 
-        self.str_format = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]
-        self.str_format_bot = STR_FORMAT_BASE[0] + fcl_bot + STR_FORMAT_BASE[1]
+        # self.str_format = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]
+        # self.str_format_bot = STR_FORMAT_BASE[0] + fcl_bot + STR_FORMAT_BASE[1]
 
 
     def reset(self):
@@ -503,7 +507,7 @@ class NexuizLogParser:
         options = {'html': HTMLRender, 'text': PlainTextRender}
         if output not in options:
             output = 'html'
-        render = options[output](header_names=HEADER_NAMES, display_bot=display_bot)
+        render = options[output](header_names=HEADER_NAMES, lnl=self.longest_name_length[display_bot])
 
         content = {'title': 'Nexuiz Stats', 'total_table': '', 'games_tables':''}
 
@@ -522,9 +526,9 @@ class NexuizLogParser:
 
         total_players = self._filter_and_sort(self.total.values(), display_bot)
         total_data = {
-                'game_number': len(self.games),
-                'player_stats': self._output_players_scores(render, total_players),
-                'player_vs_player': self._output_kills_by_player(render, total_players),
+            'game_number': len(self.games),
+            'player_stats': self._output_players_scores(render, total_players),
+            'player_vs_player': self._output_kills_by_player(render, total_players),
         }
         content['total_table'] = render.total(total_data)
 
@@ -538,17 +542,16 @@ if __name__ == '__main__':
     parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results [False]", default=False)
     parser.add_option("--nototal", action="store_false", dest='total', help="Don't display totals", default=True)
     parser.add_option("--noparcial", action="store_false", dest='parcial', help="Don't display individual game results", default=True)
-    parser.add_option("--html", action="store_true", dest='html', help="Print result in html", default=False)
+    parser.add_option("-o", '--output', action="store", help="Type of the output result.", default='html', choices=['html', 'text'])
     (options, args) = parser.parse_args()
 
     nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
     nlp.parse_log(args[0])
 
-    if options.html:
-        print nlp.output(display_bot=options.bot)
-    else:
-        if options.parcial:
-            nlp.display_games_scores(display_bot=options.bot)
-        if options.total:
-            nlp.display_total(display_bot=options.bot)
+    print nlp.output(display_bot=options.bot, output=options.output)
+    # else:
+    #     if options.parcial:
+    #         nlp.display_games_scores(display_bot=options.bot)
+    #     if options.total:
+    #         nlp.display_total(display_bot=options.bot)
         # nlp.display_parser_info()

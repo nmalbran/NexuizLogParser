@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
 
 TEMPLATE_FOLDER = 'html_templates/'
+SEP = "=" * 80 + "\n"
+STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s\n"]
 
 
 class BaseRender(object):
 
-    def __init__(self, header_names, display_bot=False):
-        self.display_bot = display_bot
+    def __init__(self, header_names, **kwargs):
         self.header_names = header_names
 
     def base(self, base_data):
@@ -42,10 +44,11 @@ class BaseRender(object):
         """
         return ''
 
+
 class HTMLRender(BaseRender):
 
-    def __init__(self, header_names, display_bot=False):
-        super(HTMLRender, self).__init__(header_names, display_bot)
+    def __init__(self, header_names, **kwargs):
+        super(HTMLRender, self).__init__(header_names, **kwargs)
         self.base_t = open(TEMPLATE_FOLDER + 'base.html').read()
         self.game_t = open(TEMPLATE_FOLDER + 'game.html').read()
         self.player_row_t = open(TEMPLATE_FOLDER + 'player_row.html').read()
@@ -90,5 +93,51 @@ class HTMLRender(BaseRender):
 
 class PlainTextRender(BaseRender):
 
-    def __init__(self, display_bot=False):
-        super(PlainTextRender, self).__init__(display_bot)
+    def __init__(self, header_names, **kwargs):
+        super(PlainTextRender, self).__init__(header_names, **kwargs)
+        lnl = kwargs['lnl']
+        fcl = str(max(lnl, 4) + 1)
+        self.player_row = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]
+        self.kills_by_player_row_base = "  %"+str(lnl)+"s"
+
+
+    def table_row_header(self):
+        return self.player_row % self.header_names
+
+    def table_row_player(self, player):
+        return self.player_row % player
+
+    def game(self, game_data):
+        output  = SEP
+        output += " MAP: %(map_name)s  TYPE: %(game_type)s  DATE: %(start_time)s  DURATION: %(duration)s \n"
+        output += SEP
+        output += "%(player_stats)s \n"
+        output += "%(player_vs_player)s \n"
+        output += "%(teams_stats)s \n"
+        output += SEP
+        return output % game_data
+
+    def base(self, base_data):
+        return "%(games_tables)s \n%(total_table)s" % base_data
+
+    def kills_by_player_header(self, players_name):
+        strf = self.kills_by_player_row_base * (len(players_name)+1)
+        return (strf + "\n") % tuple([self.header_names['killervskilled']]+players_name)
+
+    def kills_by_player_row(self, data):
+        strf = self.kills_by_player_row_base * len(data)
+        return (strf + "\n") % tuple(data)
+
+    def teams_table_header(self):
+        return "\n   %(color)s  %(caps)s  %(score)s\n" % self.header_names
+
+    def teams_table_row(self, team):
+        return "   %(color)5s  %(caps)4s  %(score)s" % team
+
+    def total(self, total_data):
+        output  = SEP
+        output += "   TOTAL  N° JUEGOS: %(game_number)s \n" % total_data
+        output += SEP
+        output += "%(player_stats)s \n%(player_vs_player)s\n" % total_data
+
+        return output
