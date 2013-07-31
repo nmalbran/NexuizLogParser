@@ -27,6 +27,7 @@ class BaseRender(object):
                                 'duration': '',
                                 'player_stats': '',
                                 'player_vs_player': '',
+                                'teams_stats': '',
             }
         """
         return ''
@@ -37,15 +38,16 @@ class HTMLRender(BaseRender):
         super(HTMLRender, self).__init__(header_names, display_bot)
         self.base_t = open(TEMPLATE_FOLDER + 'base.html').read()
         self.game_t = open(TEMPLATE_FOLDER + 'game.html').read()
-        self.row_t = open(TEMPLATE_FOLDER + 'row.html').read()
+        self.player_row_t = open(TEMPLATE_FOLDER + 'player_row.html').read()
+        self.team_row_t = open(TEMPLATE_FOLDER + 'team_row.html').read()
         self.header_css = 'header'
 
 
     def table_row_header(self):
-        return self.row_t % dict(self.header_names, css=self.header_css)
+        return self.player_row_t % dict(self.header_names, css=self.header_css)
 
     def table_row_player(self, player):
-        return self.row_t % dict(player, css='')
+        return self.player_row_t % dict(player, css='')
 
     def game(self, game_data):
         return self.game_t % game_data
@@ -60,7 +62,16 @@ class HTMLRender(BaseRender):
         return header
 
     def kills_by_player_row(self, data):
-        return "<tr>%s</tr>" % ''.join(["<td>%s</td>" % d for d in data])
+        return self._standard_row(data)
+
+    def teams_table_header(self):
+        return self.team_row_t % dict(self.header_names, css=self.header_css)
+
+    def teams_table_row(self, team):
+        return self.team_row_t % dict(team, css='')
+
+    def _standard_row(self, data, css=''):
+        return "<tr class='%s'>%s</tr>" % (css, ''.join(["<td>%s</td>" % d for d in data]))
 
 class PlainTextRender(BaseRender):
 

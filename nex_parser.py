@@ -21,7 +21,12 @@ HEADER_NAMES = {'name': 'NAME',
                 'pickup': 'PICKUPS',
                 'pweapon': 'Preffered Weapon',
                 'teams': 'TEAM',
+
                 'killervskilled': 'KILLER',
+
+                'color': 'COLOR',
+                'caps': 'CAPS',
+                'score': 'SCORE',
                 }
 
 
@@ -482,6 +487,12 @@ class NexuizLogParser:
             output += render.kills_by_player_row(line)
         return output
 
+    def _output_teams_scores(self, render, teams):
+        output = render.teams_table_header()
+        for team in teams.values():
+            output += render.teams_table_row(team)
+        return output
+
 
     def output(self, output='html', display_bot=False):
         options = {'html': HTMLRender, 'text': PlainTextRender}
@@ -497,6 +508,10 @@ class NexuizLogParser:
             game_data['player_stats'] = self._output_players_scores(render, players)
             game_data['player_vs_player'] = self._output_kills_by_player(render, players)
 
+            if 'teams' in game and game['map_data']['game_type'] == 'ctf':
+                game_data['teams_stats'] = self._output_teams_scores(render, game['teams'])
+            else:
+                game_data['teams_stats'] = ''
 
             content['games_tables'] += render.game(game_data)
 
