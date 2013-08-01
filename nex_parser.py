@@ -7,27 +7,28 @@ from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
 from render import HTMLRender, PlainTextRender
 
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
-HEADER_NAMES = {'name': 'NAME',
-                'frags': 'FRAGS',
-                'suicide': 'SUICIDES',
-                'accident': 'ACCIDENTS',
-                'tk': 'TEAM KILL',
-                'fckills': 'FC KILLS',
-                'deaths': 'DEATHS',
-                'capture': 'CAPS',
-                'steal': 'STEALS',
-                'pickup': 'PICKUPS',
-                'teams': 'TEAM',
+HEADER_NAMES = {'name': 'name',
+                'frags': 'frags',
+                'suicide': 'suicides',
+                'accident': 'accidents',
+                'tk': 'team kill',
+                'fckills': 'fc kills',
+                'deaths': 'deaths',
+                'capture': 'caps',
+                'steal': 'steals',
+                'pickup': 'pickups',
+                'teams': 'team',
 
-                'killervskilled': 'KILLER',
+                'killervskilled': 'killer',
 
-                'color': 'TEAMS',
-                'caps': 'CAPS',
-                'score': 'SCORE',
+                'color': 'teams',
+                'caps': 'caps',
+                'score': 'score',
 
-                'pweapon': 'Preffered Weapon',
-                'survival_index': 'Survival Index',
-                'cap_index': 'Capture Success Index',
+                'pweapon': 'preffered weapon',
+                'survival_index': 'survival index',
+                'cap_index': 'capture success index',
+                'nemesis': 'nemesis',
                 }
 
 
@@ -47,6 +48,7 @@ class NexuizLogParser:
             'pweapon': self.get_preffered_weapons,
             'survival_index': self.get_survival_index,
             'cap_index': self.get_cap_index,
+            'nemesis': self.get_nemesis,
         }
 
 
@@ -354,6 +356,7 @@ class NexuizLogParser:
                 self.total[pname]['pweapon'] = self.get_preffered_weapons(self.total[pname], 3)
                 self.total[pname]['survival_index'] = self.get_survival_index(self.total[pname])
                 self.total[pname]['cap_index'] = self.get_cap_index(self.total[pname])
+                self.total[pname]['nemesis'] = self.get_nemesis(self.total[pname])
 
 
 
@@ -394,9 +397,12 @@ class NexuizLogParser:
     def get_cap_index(self, player):
         return str(round((player['capture'] * 100.0) / ((player['steal'] + player['pickup']) or 1), 1))+ " %"
 
-    # def get_nemesis(self, player):
-    #     sorted(player['deaths_by_player'].items(), key=lambda x:x[1], reverse=True)
-
+    def get_nemesis(self, player):
+        ordered_nemesis = sorted(player['deaths_by_player'].items(), key=lambda x:x[1], reverse=True)
+        try:
+            return ordered_nemesis[0][0]
+        except IndexError as e:
+            return ''
 
     def display_parser_info(self):
         """

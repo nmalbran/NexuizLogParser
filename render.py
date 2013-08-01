@@ -48,7 +48,8 @@ class BaseRender(object):
 class HTMLRender(BaseRender):
 
     def __init__(self, header_names, **kwargs):
-        super(HTMLRender, self).__init__(header_names, **kwargs)
+        capitalized_names = dict([(i, n.capitalize()) for i,n in header_names.items()])
+        super(HTMLRender, self).__init__(capitalized_names, **kwargs)
         self.base_t = open(TEMPLATE_FOLDER + 'base.html').read()
         self.game_t = open(TEMPLATE_FOLDER + 'game.html').read()
         self.player_row_t = open(TEMPLATE_FOLDER + 'player_row.html').read()
@@ -95,7 +96,8 @@ class HTMLRender(BaseRender):
 class PlainTextRender(BaseRender):
 
     def __init__(self, header_names, **kwargs):
-        super(PlainTextRender, self).__init__(header_names, **kwargs)
+        uppercased_names = dict([(i, n.upper()) for i,n in header_names.items()])
+        super(PlainTextRender, self).__init__(uppercased_names, **kwargs)
         lnl = kwargs['lnl']
         fcl = str(max(lnl, 4) + 1)
         self.player_row = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]

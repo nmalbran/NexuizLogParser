@@ -33,6 +33,7 @@ table tr.header td{
     border-bottom: 1px solid black;
     font-weight: bold;
     text-align: center;
+    text-transform: capitalize;
 }
 
 td.text{
