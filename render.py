@@ -54,6 +54,7 @@ class HTMLRender(BaseRender):
         self.player_row_t = open(TEMPLATE_FOLDER + 'player_row.html').read()
         self.team_row_t = open(TEMPLATE_FOLDER + 'team_row.html').read()
         self.total_t = open(TEMPLATE_FOLDER + 'total.html').read()
+        self.css = open(TEMPLATE_FOLDER + 'style.css').read()
         self.header_css = 'header'
 
 
@@ -67,7 +68,7 @@ class HTMLRender(BaseRender):
         return self.game_t % game_data
 
     def base(self, base_data):
-        return self.base_t % base_data
+        return self.base_t % dict(base_data, css=self.css)
 
     def kills_by_player_header(self, players_name):
         header = "<tr class='" + self.header_css + "'><td>%(killervskilled)s</td>" % self.header_names

@@ -422,7 +422,7 @@ class NexuizLogParser:
             output = 'html'
         render = options[output](header_names=HEADER_NAMES, lnl=self.longest_name_length[display_bot])
 
-        content = {'title': 'Nexuiz Stats', 'total_table': '', 'games_tables':''}
+        content = {'title': 'Nexuiz Statistics', 'total_table': '', 'games_tables':''}
         game_number = 0
         for i, game in sorted(self.games.items(), key=lambda x: x[0]):
             players = self._filter_and_sort(game['players'].values(), display_bot)

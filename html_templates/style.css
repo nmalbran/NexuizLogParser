@@ -1,0 +1,66 @@
+#container{
+    width: 90%;
+    margin: 0 auto;
+}
+
+h1, h2, h3{
+    color: blue;
+}
+
+#titulo{
+    color: blue;
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 0;
+}
+
+table{
+    border: 1px solid black;
+    margin: 0.5em;
+    border-collapse:collapse;
+}
+
+table tr.header{
+    background: #DDDDDD;
+}
+
+td{
+    padding: 0.3em 0.5em;
+    text-align: center;
+}
+
+table tr.header td{
+    border-bottom: 1px solid black;
+    font-weight: bold;
+    text-align: center;
+}
+
+td.text{
+    text-align: left;
+}
+
+tr td:first-child{
+    border-right: 1px solid black;
+    font-weight: bold;
+    text-align: left;
+}
+
+.map td:first-child{
+    border-right: 0;
+}
+
+tr:hover{
+    background: #DDDDDD;
+}
+
+.game{
+    border: 1px solid #AAAAAA;
+    padding: 0.5em;
+    margin-top: 0.5em;
+}
+
+.author{
+    padding: 1em;
+    text-align: center;
+    font-style: italic;
+}
