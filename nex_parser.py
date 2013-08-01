@@ -17,7 +17,6 @@ HEADER_NAMES = {'name': 'NAME',
                 'capture': 'CAPS',
                 'steal': 'STEALS',
                 'pickup': 'PICKUPS',
-                'pweapon': 'Preffered Weapon',
                 'teams': 'TEAM',
 
                 'killervskilled': 'KILLER',
@@ -25,6 +24,10 @@ HEADER_NAMES = {'name': 'NAME',
                 'color': 'TEAMS',
                 'caps': 'CAPS',
                 'score': 'SCORE',
+
+                'pweapon': 'Preffered Weapon',
+                'survival_index': 'Survival Index',
+                'cap_index': 'Capture Success Index',
                 }
 
 
@@ -38,6 +41,12 @@ class NexuizLogParser:
         self.longest_name_length = {
             True: max([len(p) for p in known_player_nicks.keys()]), # display_bot = True
             False: max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)]), # display_bot = False
+        }
+
+        self.special_stats = {
+            'pweapon': self.get_preffered_weapons,
+            'survival_index': self.get_survival_index,
+            'cap_index': self.get_cap_index,
         }
 
 
@@ -174,8 +183,6 @@ class NexuizLogParser:
                                                                         'dropped': 0,
                                                                         'pickup': 0,}
 
-
-
                 elif command_name == "team":
                     player_id , team_id = command[1:]
                     change_time = gametime - self.games[self.count]['map_data']['start_time']
@@ -307,7 +314,8 @@ class NexuizLogParser:
     def _compute_extra_stats(self):
         for i, game in self.games.items():
             for pid, player in game['players'].items():
-                self.games[i]['players'][pid]['pweapon'] = self.get_preffered_weapons(player['kills_by_weapon'])
+                for stat, stat_func in self.special_stats.items():
+                    self.games[i]['players'][pid][stat] = stat_func(player)
 
 
     def _compute_total(self):
@@ -337,7 +345,11 @@ class NexuizLogParser:
 
                 for weapon, num in player['kills_by_weapon'].items():
                     self.total[pname]['kills_by_weapon'][weapon] = self.total[pname]['kills_by_weapon'].get(weapon, 0) + num
-                self.total[pname]['pweapon'] = self.get_preffered_weapons(self.total[pname]['kills_by_weapon'], 3)
+
+                self.total[pname]['pweapon'] = self.get_preffered_weapons(self.total[pname], 3)
+                self.total[pname]['survival_index'] = self.get_survival_index(self.total[pname])
+                self.total[pname]['cap_index'] = self.get_cap_index(self.total[pname])
+
 
 
     def _parse_weapon(self, weapon):
@@ -367,9 +379,18 @@ class NexuizLogParser:
         return (weapon_str, clean_mod)
 
 
-    def get_preffered_weapons(self, weapon_dict, num=2):
-        weapons = sorted(weapon_dict.items(), key=lambda x: x[1], reverse=True)[:num]
+    def get_preffered_weapons(self, player, num=2):
+        weapons = sorted(player['kills_by_weapon'].items(), key=lambda x: x[1], reverse=True)[:num]
         return ", ".join(["%s(%d)" % w for w in weapons])
+
+    def get_survival_index(self, player):
+        return round((player['frags'] * 1.0) / (player['deaths'] or 1), 2)
+
+    def get_cap_index(self, player):
+        return str(round((player['capture'] * 100.0) / ((player['steal'] + player['pickup']) or 1), 1))+ " %"
+
+    # def get_nemesis(self, player):
+    #     sorted(player['deaths_by_player'].items(), key=lambda x:x[1], reverse=True)
 
 
     def display_parser_info(self):

@@ -83,6 +83,8 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'pickup': int,
 
                                                   'pweapon': str,
+                                                  'survival_index': float,
+                                                  'cap_index': float %,
                                      },
                                      player2_id: {...},
                          }
@@ -122,6 +124,8 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'pickup': int,
 
                                   'pweapon': str,
+                                  'survival_index': float,
+                                  'cap_index': float %,
                    },
                    player2_name: {...},
                   }
