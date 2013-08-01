@@ -143,5 +143,5 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
 
 - `pweapon`: The name of the weapon used to kill the most
 - `survival_index`: `frags / deaths`
-- `cap_index`: `caps *100 / (steal + pickup)`%
+- `cap_index`: `capture *100 / (steal + pickup)`%
 - `nemesis`: The name of the player who killed most times this player
