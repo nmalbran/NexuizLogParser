@@ -460,14 +460,11 @@ class NexuizLogParser:
             output = 'html'
         render = options[output](header_names=HEADER_NAMES, lnl=self.longest_name_length[display_bot])
 
-        if len(self.logfile_list) > 1:
-            logfile = "several files"
-        elif len(self.logfile_list) == 1:
-            logfile = self.logfile_list[0]
-        else:
-            logfile = ''
-        title = 'Nexuiz Statistics from log file: %s' % logfile
-        content = {'title': title, 'total_table': '', 'games_tables':''}
+        content = {'title': 'Nexuiz Statistics',
+                   'logfiles': ', '.join([os.path.basename(log) for log in self.logfile_list]),
+                   'total_table': '',
+                   'games_tables':'',
+                   }
         game_number = 0
 
         if display_parcial:
