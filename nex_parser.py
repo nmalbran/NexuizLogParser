@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 from datetime import datetime
 from optparse import OptionParser
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
@@ -51,6 +52,7 @@ class NexuizLogParser:
         self.player_nicks = set()
         self.info = []
         self.total = dict()
+        self.logfile = ''
 
 
     def is_bot(self, name):
@@ -85,6 +87,7 @@ class NexuizLogParser:
         """
             Parse the log in `logfile`.
         """
+        self.logfile = logfile
         for line in open(logfile):
             self.line_number += 1
 
@@ -422,7 +425,8 @@ class NexuizLogParser:
             output = 'html'
         render = options[output](header_names=HEADER_NAMES, lnl=self.longest_name_length[display_bot])
 
-        content = {'title': 'Nexuiz Statistics', 'total_table': '', 'games_tables':''}
+        title = 'Nexuiz Statistics from log file: %s' % os.path.basename(self.logfile)
+        content = {'title': title, 'total_table': '', 'games_tables':''}
         game_number = 0
         for i, game in sorted(self.games.items(), key=lambda x: x[0]):
             players = self._filter_and_sort(game['players'].values(), display_bot)
