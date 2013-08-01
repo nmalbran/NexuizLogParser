@@ -63,7 +63,7 @@ class NexuizLogParser:
         self.player_nicks = set()
         self.info = []
         self.total = dict()
-        self.logfile = ''
+        self.logfile_list = []
 
 
     def is_bot(self, name):
@@ -94,220 +94,222 @@ class NexuizLogParser:
         return self.total
 
 
-    def parse_log(self, logfile):
+    def parse_log(self, logfile_list):
         """
             Parse the log in `logfile`.
         """
-        self.logfile = logfile
+        self.logfile_list = logfile_list
         players_name = dict()
-        for line in open(logfile):
-            self.line_number += 1
+        for logfile in logfile_list:
+            self.line_number = 0
+            for line in open(logfile):
+                self.line_number += 1
 
-            if (len(line) > 25) and (line[24] == ":"):
-                timestamp = line[3:22]
-                gametime = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+                if (len(line) > 25) and (line[24] == ":"):
+                    timestamp = line[3:22]
+                    gametime = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
 
-                command = line[25:].strip().split(":")
+                    command = line[25:].strip().split(":")
 
-                ########################
-                # COMAND PARSING START #
-                ########################
-                command_name = command[0]
-                if command_name == "gamestart":
-                    underscore_pos = command[1].find('_')
-                    game_type = command[1][:underscore_pos]
-                    map_name = command[1][underscore_pos+1:]
+                    ########################
+                    # COMAND PARSING START #
+                    ########################
+                    command_name = command[0]
+                    if command_name == "gamestart":
+                        underscore_pos = command[1].find('_')
+                        game_type = command[1][:underscore_pos]
+                        map_name = command[1][underscore_pos+1:]
 
-                    players_name = dict()
-                    self.in_game = True
-                    self.games[self.count] = dict()
-                    self.games[self.count]['map_data'] = {'map_name': map_name,
-                                                          'start_time': gametime,
-                                                          'duration': '',
-                                                          'game_type': game_type,
-                                                          }
+                        players_name = dict()
+                        self.in_game = True
+                        self.games[self.count] = dict()
+                        self.games[self.count]['map_data'] = {'map_name': map_name,
+                                                              'start_time': gametime,
+                                                              'duration': '',
+                                                              'game_type': game_type,
+                                                              }
 
-                    self.games[self.count]['teams'] = dict()
-                    for (t_id, team) in self.teams.items():
-                        self.games[self.count]['teams'][t_id] = {'id': t_id, 'color': team, 'caps': 0, 'score': 0}
+                        self.games[self.count]['teams'] = dict()
+                        for (t_id, team) in self.teams.items():
+                            self.games[self.count]['teams'][t_id] = {'id': t_id, 'color': team, 'caps': 0, 'score': 0}
 
-                elif not self.in_game:
-                    # commands outside a game are discarded
-                    continue
-
-                elif command_name == "gameinfo":
-                    subcommand = command[1]
-                    if subcommand == "end":
-                        pass
-                    elif subcommand == "mutators":
-                        mutators = command[2:]
-                    else:
-                        # just to discover other gameinfo log lines
-                        self.info.append('gameinfo subcommand not recognized (line %d):' % line_number)
-                        self.info.append(command)
-
-                elif command_name == "scores":
-                    pass
-
-                elif command_name == "join":
-                    # This data is valid only during this game
-                    # ip_from: IP address of the player
-                    # nick: Nickname of the player
-                    # xx: ??
-                    player_id, xx, ip_from, nick = command[1:]
-                    #if nick[0:5] != "[BOT]":
-                    player_name = self._get_name_from_nick(nick)
-
-                    if 'players' not in self.games[self.count]:
-                        self.games[self.count]['players'] = dict()
-
-                    if player_id not in players_name:
-                        players_name[player_id] = player_name
-
-                    if player_name not in self.games[self.count]['players']:
-                        self.games[self.count]['players'][player_name] = {
-                                                                        'id': player_id,
-                                                                        'ip': ip_from,
-                                                                        'nick': nick,
-                                                                        'name': player_name,
-
-                                                                        'team': [],
-
-                                                                        'frags': 0,
-                                                                        'suicide': 0,
-                                                                        'accident': 0,
-                                                                        'tk': 0,
-                                                                        'deaths': 0,
-                                                                        'fckills': 0,
-
-                                                                        'kills_by_player': dict(),
-                                                                        'deaths_by_player': dict(),
-                                                                        'kills_by_weapon': dict(),
-
-                                                                        'capture': 0,
-                                                                        'return': 0,
-                                                                        'steal': 0,
-                                                                        'dropped': 0,
-                                                                        'pickup': 0,}
-
-                elif command_name == "team":
-                    player_id , team_id = command[1:]
-                    change_time = gametime - self.games[self.count]['map_data']['start_time']
-                    if team_id not in self.teams:
+                    elif not self.in_game:
+                        # commands outside a game are discarded
                         continue
-                    self.games[self.count]['players'][players_name[player_id]]['team'].append("%s (%s)" % (self.teams[team_id], change_time))
 
-                elif command_name == "kill":
-                    text, killer, killed = command[1:4]
-                    other_data = command[4:] # items=killer weapon, victimitems=killed weapon
-                    killer = players_name[killer]
-                    killed = players_name[killed]
-                    self.games[self.count]['players'][killed]['deaths'] += 1
+                    elif command_name == "gameinfo":
+                        subcommand = command[1]
+                        if subcommand == "end":
+                            pass
+                        elif subcommand == "mutators":
+                            mutators = command[2:]
+                        else:
+                            # just to discover other gameinfo log lines
+                            self.info.append('gameinfo subcommand not recognized (line %d):' % line_number)
+                            self.info.append(command)
 
-                    killer_weapon, killer_mod = self._parse_weapon(other_data[1][6:])
-                    if text in ['frag', 'tk']:
-                        killed_weapon, killed_mod = self._parse_weapon(other_data[2][12:])
+                    elif command_name == "scores":
+                        pass
 
-                    self.games[self.count]['players'][killer]['kills_by_weapon'][killer_weapon] = self.games[self.count]['players'][killer]['kills_by_weapon'].get(killer_weapon, 0) + 1
+                    elif command_name == "join":
+                        # This data is valid only during this game
+                        # ip_from: IP address of the player
+                        # nick: Nickname of the player
+                        # xx: ??
+                        player_id, xx, ip_from, nick = command[1:]
+                        #if nick[0:5] != "[BOT]":
+                        player_name = self._get_name_from_nick(nick)
 
-                    if text == "frag":         # kill other player
-                        self.games[self.count]['players'][killer]['frags'] += 1
-                        self.games[self.count]['players'][killer]['kills_by_player'][killed] = self.games[self.count]['players'][killer]['kills_by_player'].get(killed, 0) + 1
-                        self.games[self.count]['players'][killed]['deaths_by_player'][killer] = self.games[self.count]['players'][killed]['deaths_by_player'].get(killer, 0) + 1
+                        if 'players' not in self.games[self.count]:
+                            self.games[self.count]['players'] = dict()
 
-                        if FLAG in killed_mod:
-                            self.games[self.count]['players'][killer]['fckills'] += 1
+                        if player_id not in players_name:
+                            players_name[player_id] = player_name
+
+                        if player_name not in self.games[self.count]['players']:
+                            self.games[self.count]['players'][player_name] = {
+                                                                            'id': player_id,
+                                                                            'ip': ip_from,
+                                                                            'nick': nick,
+                                                                            'name': player_name,
+
+                                                                            'team': [],
+
+                                                                            'frags': 0,
+                                                                            'suicide': 0,
+                                                                            'accident': 0,
+                                                                            'tk': 0,
+                                                                            'deaths': 0,
+                                                                            'fckills': 0,
+
+                                                                            'kills_by_player': dict(),
+                                                                            'deaths_by_player': dict(),
+                                                                            'kills_by_weapon': dict(),
+
+                                                                            'capture': 0,
+                                                                            'return': 0,
+                                                                            'steal': 0,
+                                                                            'dropped': 0,
+                                                                            'pickup': 0,}
+
+                    elif command_name == "team":
+                        player_id , team_id = command[1:]
+                        change_time = gametime - self.games[self.count]['map_data']['start_time']
+                        if team_id not in self.teams:
+                            continue
+                        self.games[self.count]['players'][players_name[player_id]]['team'].append("%s (%s)" % (self.teams[team_id], change_time))
+
+                    elif command_name == "kill":
+                        text, killer, killed = command[1:4]
+                        other_data = command[4:] # items=killer weapon, victimitems=killed weapon
+                        killer = players_name[killer]
+                        killed = players_name[killed]
+                        self.games[self.count]['players'][killed]['deaths'] += 1
+
+                        killer_weapon, killer_mod = self._parse_weapon(other_data[1][6:])
+                        if text in ['frag', 'tk']:
+                            killed_weapon, killed_mod = self._parse_weapon(other_data[2][12:])
+
+                        self.games[self.count]['players'][killer]['kills_by_weapon'][killer_weapon] = self.games[self.count]['players'][killer]['kills_by_weapon'].get(killer_weapon, 0) + 1
+
+                        if text == "frag":         # kill other player
+                            self.games[self.count]['players'][killer]['frags'] += 1
+                            self.games[self.count]['players'][killer]['kills_by_player'][killed] = self.games[self.count]['players'][killer]['kills_by_player'].get(killed, 0) + 1
+                            self.games[self.count]['players'][killed]['deaths_by_player'][killer] = self.games[self.count]['players'][killed]['deaths_by_player'].get(killer, 0) + 1
+
+                            if FLAG in killed_mod:
+                                self.games[self.count]['players'][killer]['fckills'] += 1
 
 
-                    elif text == "suicide":    # kill himself, by weapon
-                        self.games[self.count]['players'][killer]['suicide'] += 1
-                    elif text == "accident":   # kill himself, not by weapon
-                        self.games[self.count]['players'][killer]['accident'] += 1
-                    elif text == "tk":         # TeamMate kill
-                        self.games[self.count]['players'][killer]['tk'] += 1
+                        elif text == "suicide":    # kill himself, by weapon
+                            self.games[self.count]['players'][killer]['suicide'] += 1
+                        elif text == "accident":   # kill himself, not by weapon
+                            self.games[self.count]['players'][killer]['accident'] += 1
+                        elif text == "tk":         # TeamMate kill
+                            self.games[self.count]['players'][killer]['tk'] += 1
+                        else:
+                            self.info.append('kill text not recognized for command (line %d):' % self.line_number)
+                            self.info.append(command)
+
+                    elif command_name == "ctf":
+                        # Recognized subcommand:
+                        #  returned --> lost flag automatically returned by timeout
+                        #  capture  --> a capture for the team
+                        #  return   --> flag returned by a player
+                        #  steal    --> flag stealed by a player (flag in the base)
+                        #  dropped  --> flag dropped by the player
+                        #  pickup   --> flag taken by a player (flag in the field)
+                        subcommand = command[1]
+                        team_id = command[2]
+                        if subcommand == "returned":
+                            pass
+                        elif (subcommand == "capture" or
+                             subcommand == "return"  or
+                             subcommand == "steal"   or
+                             subcommand == "dropped" or
+                             subcommand == "pickup"):
+                            player_id = command[3]
+                            self.games[self.count]['players'][players_name[player_id]][subcommand] += 1
+                        else:
+                            self.info.append('ctf subcommand not recognized (line %d):' % self.line_number)
+                            self.info.append(command)
+
+                    elif command_name == "part":
+                        # This means: "player_id left the game"
+                        player_id = command[1]
+
+                    elif command_name == "labels":
+                        subcommand = command[1]
+                        if subcommand == "player":
+                            pass
+                        elif subcommand == "teamscores":
+                            pass
+                        else:
+                            self.info.append('labels subcommand not recognized (line %d):' % self.line_number)
+                            self.info.append(command)
+
+                    elif command_name == "player":
+                        # final stats for player
+                        player_stats = command[2:]
+
+                    elif command_name == "teamscores":
+                        # final stats for teams
+                        team_stats = command[2]
+                        team_id = command[3]
+                        if team_id in self.teams and team_stats:
+                            caps, score = team_stats.split(',')
+                            self.games[self.count]['teams'][team_id]['caps'] = int(caps)
+                            self.games[self.count]['teams'][team_id]['score'] = int(score)
+
+                    elif command_name == "end":
+                        self.games[self.count]['map_data']['end_time'] = gametime
+                        self.games[self.count]['map_data']['duration'] = str(gametime - self.games[self.count]['map_data']['start_time'])
+
+                    elif command_name == "gameover":
+                        # This command marks the end of the game
+                        self.count += 1
+                        self.in_game = False
+                        #break # for testing only... I want to play with 1 game's data
+
+                    elif command_name == "vote":
+                        # This command shows map voting
+                        subcommand = command[1]
+                        if subcommand == "keeptwo":
+                            pass
+                        elif subcommand == "finished":
+                            pass
+
+                    elif command_name == "recordset":
+                        pass
+
+                    elif command_name == "name":
+                        # Player changes his/her name
+                        pass
+
                     else:
-                        self.info.append('kill text not recognized for command (line %d):' % self.line_number)
+                        # This is to show any unknown command
+                        self.info.append('main command not recognized (line %d):' % line_number)
                         self.info.append(command)
-
-                elif command_name == "ctf":
-                    # Recognized subcommand:
-                    #  returned --> lost flag automatically returned by timeout
-                    #  capture  --> a capture for the team
-                    #  return   --> flag returned by a player
-                    #  steal    --> flag stealed by a player (flag in the base)
-                    #  dropped  --> flag dropped by the player
-                    #  pickup   --> flag taken by a player (flag in the field)
-                    subcommand = command[1]
-                    team_id = command[2]
-                    if subcommand == "returned":
-                        pass
-                    elif (subcommand == "capture" or
-                         subcommand == "return"  or
-                         subcommand == "steal"   or
-                         subcommand == "dropped" or
-                         subcommand == "pickup"):
-                        player_id = command[3]
-                        self.games[self.count]['players'][players_name[player_id]][subcommand] += 1
-                    else:
-                        self.info.append('ctf subcommand not recognized (line %d):' % self.line_number)
-                        self.info.append(command)
-
-                elif command_name == "part":
-                    # This means: "player_id left the game"
-                    player_id = command[1]
-
-                elif command_name == "labels":
-                    subcommand = command[1]
-                    if subcommand == "player":
-                        pass
-                    elif subcommand == "teamscores":
-                        pass
-                    else:
-                        self.info.append('labels subcommand not recognized (line %d):' % self.line_number)
-                        self.info.append(command)
-
-                elif command_name == "player":
-                    # final stats for player
-                    player_stats = command[2:]
-
-                elif command_name == "teamscores":
-                    # final stats for teams
-                    team_stats = command[2]
-                    team_id = command[3]
-                    if team_id in self.teams and team_stats:
-                        caps, score = team_stats.split(',')
-                        self.games[self.count]['teams'][team_id]['caps'] = int(caps)
-                        self.games[self.count]['teams'][team_id]['score'] = int(score)
-
-                elif command_name == "end":
-                    self.games[self.count]['map_data']['end_time'] = gametime
-                    self.games[self.count]['map_data']['duration'] = str(gametime - self.games[self.count]['map_data']['start_time'])
-
-                elif command_name == "gameover":
-                    # This command marks the end of the game
-                    self.count += 1
-                    self.in_game = False
-                    #break # for testing only... I want to play with 1 game's data
-
-                elif command_name == "vote":
-                    # This command shows map voting
-                    subcommand = command[1]
-                    if subcommand == "keeptwo":
-                        pass
-                    elif subcommand == "finished":
-                        pass
-
-                elif command_name == "recordset":
-                    pass
-
-                elif command_name == "name":
-                    # Player changes his/her name
-                    pass
-
-                else:
-                    # This is to show any unknown command
-                    self.info.append('main command not recognized (line %d):' % line_number)
-                    self.info.append(command)
 
         self._clean_games()
         self._compute_extra_stats()
@@ -458,7 +460,13 @@ class NexuizLogParser:
             output = 'html'
         render = options[output](header_names=HEADER_NAMES, lnl=self.longest_name_length[display_bot])
 
-        title = 'Nexuiz Statistics from log file: %s' % os.path.basename(self.logfile)
+        if len(self.logfile_list) > 1:
+            logfile = "several files"
+        elif len(self.logfile_list) == 1:
+            logfile = self.logfile_list[0]
+        else:
+            logfile = ''
+        title = 'Nexuiz Statistics from log file: %s' % logfile
         content = {'title': title, 'total_table': '', 'games_tables':''}
         game_number = 0
 
@@ -507,7 +515,7 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
-    nlp.parse_log(args[0])
+    nlp.parse_log(args)
 
     if not options.output:
         filename = 'parsedlog.%s' % options.type
