@@ -447,7 +447,7 @@ class NexuizLogParser:
 
 
     def output(self, output='html', display_bot=False):
-        options = {'html': HTMLRender, 'text': PlainTextRender}
+        options = {'html': HTMLRender, 'txt': PlainTextRender}
         if output not in options:
             output = 'html'
         render = options[output](header_names=HEADER_NAMES, lnl=self.longest_name_length[display_bot])
@@ -485,15 +485,27 @@ class NexuizLogParser:
 if __name__ == '__main__':
     from players import KNOWN_PLAYER_NICKS
 
-    parser = OptionParser()
-    parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results [False]", default=False)
+    parser = OptionParser(usage='usage: %prog [options] logfile')
+    parser.add_option("-t", '--type', action="store", help="Type of the output result (html, txt)", default='html', choices=['html', 'txt'])
+    parser.add_option("-o", '--output', action="store", help="File to output result.", default='')
+    parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results", default=False)
     parser.add_option("--nototal", action="store_false", dest='total', help="Don't display totals", default=True)
     parser.add_option("--noparcial", action="store_false", dest='parcial', help="Don't display individual game results", default=True)
-    parser.add_option("-o", '--output', action="store", help="Type of the output result.", default='html', choices=['html', 'text'])
+    parser.add_option("-q", "--quiet", action="store_false", dest='info', help="Don't display parser error", default=True)
+
     (options, args) = parser.parse_args()
 
     nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
     nlp.parse_log(args[0])
 
-    print nlp.output(display_bot=options.bot, output=options.output)
-    # nlp.display_parser_info()
+    if not options.output:
+        filename = 'parsedlog.%s' % options.type
+    else:
+        filename = options.output
+    f = open(filename, 'w')
+    output = nlp.output(display_bot=options.bot, output=options.type)
+    f.write(output)
+    f.close()
+
+    if options.info:
+        nlp.display_parser_info()
