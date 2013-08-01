@@ -501,7 +501,7 @@ class NexuizLogParser:
 if __name__ == '__main__':
     from players import KNOWN_PLAYER_NICKS
 
-    parser = OptionParser(usage='usage: %prog [options] logfile')
+    parser = OptionParser(usage='usage: %prog [options] logfile1 [logfile2 logfile3 ...]')
     parser.add_option("-t", '--type', action="store", help="Type of the output result (html, txt)", default='html', choices=['html', 'txt'])
     parser.add_option("-o", '--output', action="store", help="File to output result.", default='')
     parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results", default=False)

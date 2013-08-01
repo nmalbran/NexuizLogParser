@@ -7,10 +7,11 @@ Based in Trablas' parser.
 ### Usage example
 
 #### CLI
-    python nex_parser.py -o text server.log
-    python nex_parser.py server.log > stats.html
+    python nex_parser.py -t txt server.log
+    python nex_parser.py -o stats.html server.log
+    python nex_parser.py *.log -o all.html
 
-    Usage: nex_parser.py [options] logfile
+    Usage: nex_parser.py [options] logfile1 [logfile2 logfile3 ...]
     Options:
       -h, --help            show this help message and exit
       -t TYPE, --type=TYPE  Type of the output result (html, txt)
@@ -20,6 +21,7 @@ Based in Trablas' parser.
       --nototal             Don't display totals
       --noparcial           Don't display individual game results
       -q, --quiet           Don't display parser error
+
 
 
 #### As module
