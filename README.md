@@ -7,7 +7,8 @@ Based in Trablas' parser.
 ### Usage example
 
 #### CLI
-    python nex_parser.py server.log
+    python nex_parser.py -o text server.log
+    python nex_parser.py server.log > stats.html
 
 #### As module
     from nex_parser import NexuizLogParser
