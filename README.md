@@ -49,8 +49,8 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                    team2_id: {...},
                          },
                          'players': {
-                                     player1_id: {
-                                                  'id': player1_id,
+                                     player1_name: {
+                                                  'id': int,
                                                   'ip': string,
                                                   'nick': string,
                                                   'name': string,
@@ -64,12 +64,12 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'accident': int,
 
                                                   'kills_by_player': {
-                                                                      player2_id: int,
-                                                                      player3_id: int,
+                                                                      player1_name: int,
+                                                                      player2_name: int,
                                                   },
                                                   'deaths_by_player': {
-                                                                      player2_id: int,
-                                                                      player3_id: int,
+                                                                      player1_name: int,
+                                                                      player2_name: int,
                                                   },
                                                   'kills_by_weapon': {
                                                                       weapon_name1: int,
@@ -86,7 +86,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'survival_index': float,
                                                   'cap_index': float %,
                                      },
-                                     player2_id: {...},
+                                     player2_name: {...},
                          }
                      },
                      1: {...},
@@ -132,7 +132,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
 
 *Notes*:
 
-- `teamX_id` & `playerX_id` are the id given by Nexuiz, in string format.
+- `teamX_id` is the id given by Nexuiz, in string format.
 - `[]['players']['nick']` is the nickname used in that game, while `[]['players']['name']` is the name mapped by `KNOWN_PLAYER_NICKS`.
 - The time in `[]['players']['team']` is when the player joined the team.
 - The top level numbers are the game's number, in order of appearance in the log.

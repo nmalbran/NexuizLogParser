@@ -97,6 +97,7 @@ class NexuizLogParser:
             Parse the log in `logfile`.
         """
         self.logfile = logfile
+        players_name = dict()
         for line in open(logfile):
             self.line_number += 1
 
@@ -115,6 +116,7 @@ class NexuizLogParser:
                     game_type = command[1][:underscore_pos]
                     map_name = command[1][underscore_pos+1:]
 
+                    players_name = dict()
                     self.in_game = True
                     self.games[self.count] = dict()
                     self.games[self.count]['map_data'] = {'map_name': map_name,
@@ -157,8 +159,11 @@ class NexuizLogParser:
                     if 'players' not in self.games[self.count]:
                         self.games[self.count]['players'] = dict()
 
-                    if player_id not in self.games[self.count]['players']:
-                        self.games[self.count]['players'][player_id] = {
+                    if player_id not in players_name:
+                        players_name[player_id] = player_name
+
+                    if player_name not in self.games[self.count]['players']:
+                        self.games[self.count]['players'][player_name] = {
                                                                         'id': player_id,
                                                                         'ip': ip_from,
                                                                         'nick': nick,
@@ -188,11 +193,13 @@ class NexuizLogParser:
                     change_time = gametime - self.games[self.count]['map_data']['start_time']
                     if team_id not in self.teams:
                         continue
-                    self.games[self.count]['players'][player_id]['team'].append("%s (%s)" % (self.teams[team_id], change_time))
+                    self.games[self.count]['players'][players_name[player_id]]['team'].append("%s (%s)" % (self.teams[team_id], change_time))
 
                 elif command_name == "kill":
                     text, killer, killed = command[1:4]
                     other_data = command[4:] # items=killer weapon, victimitems=killed weapon
+                    killer = players_name[killer]
+                    killed = players_name[killed]
                     self.games[self.count]['players'][killed]['deaths'] += 1
 
                     killer_weapon, killer_mod = self._parse_weapon(other_data[1][6:])
@@ -238,7 +245,7 @@ class NexuizLogParser:
                          subcommand == "dropped" or
                          subcommand == "pickup"):
                         player_id = command[3]
-                        self.games[self.count]['players'][player_id][subcommand] += 1
+                        self.games[self.count]['players'][players_name[player_id]][subcommand] += 1
                     else:
                         self.info.append('ctf subcommand not recognized (line %d):' % self.line_number)
                         self.info.append(command)
@@ -313,9 +320,9 @@ class NexuizLogParser:
 
     def _compute_extra_stats(self):
         for i, game in self.games.items():
-            for pid, player in game['players'].items():
+            for pname, player in game['players'].items():
                 for stat, stat_func in self.special_stats.items():
-                    self.games[i]['players'][pid][stat] = stat_func(player)
+                    self.games[i]['players'][pname][stat] = stat_func(player)
 
 
     def _compute_total(self):
@@ -324,10 +331,8 @@ class NexuizLogParser:
         for game in self.games.values():
             if 'players' not in game:
                 continue
-            players = game['players'].values()
-            players_id = dict([(p['id'], p['name']) for p in players])
 
-            for player in players:
+            for player in game['players'].values():
                 pname = player['name']
                 if pname not in self.total:
                     self.total[pname] = {'name': pname, 'team': [], 'kills_by_weapon': dict()}
@@ -339,8 +344,8 @@ class NexuizLogParser:
                     if stat not in self.total[pname]:
                         self.total[pname][stat] = dict()
 
-                    for pid, num in player[stat].items():
-                        self.total[pname][stat][players_id[pid]] = self.total[pname][stat].get(players_id[pid], 0) + num
+                    for p2name, num in player[stat].items():
+                        self.total[pname][stat][p2name] = self.total[pname][stat].get(p2name, 0) + num
 
 
                 for weapon, num in player['kills_by_weapon'].items():
@@ -420,16 +425,11 @@ class NexuizLogParser:
         return output
 
     def _output_kills_by_player(self, render, players):
-        if 'id' in players[0]:
-            key = 'id'
-        else:
-            key= 'name'
-
         output = render.kills_by_player_header([p['name'] for p in players])
         for killer in players:
             line = [killer['name']]
             for killed in players:
-                line.append(killer['kills_by_player'].get(killed[key], 0))
+                line.append(killer['kills_by_player'].get(killed['name'], 0))
             output += render.kills_by_player_row(line)
         return output
 
