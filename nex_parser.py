@@ -423,9 +423,11 @@ class NexuizLogParser:
         render = options[output](header_names=HEADER_NAMES, lnl=self.longest_name_length[display_bot])
 
         content = {'title': 'Nexuiz Stats', 'total_table': '', 'games_tables':''}
-
+        game_number = 0
         for i, game in sorted(self.games.items(), key=lambda x: x[0]):
             players = self._filter_and_sort(game['players'].values(), display_bot)
+            if len(players) < 1:
+                continue
             game_data = game['map_data']
             game_data['player_stats'] = self._output_players_scores(render, players)
             game_data['player_vs_player'] = self._output_kills_by_player(render, players)
@@ -436,10 +438,11 @@ class NexuizLogParser:
                 game_data['teams_stats'] = ''
 
             content['games_tables'] += render.game(game_data)
+            game_number += 1
 
         total_players = self._filter_and_sort(self.total.values(), display_bot)
         total_data = {
-            'game_number': len(self.games),
+            'game_number': game_number,
             'player_stats': self._output_players_scores(render, total_players),
             'player_vs_player': self._output_kills_by_player(render, total_players),
         }
