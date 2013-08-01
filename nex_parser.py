@@ -446,7 +446,13 @@ class NexuizLogParser:
         return output
 
 
-    def output(self, output='html', display_bot=False):
+    def output(self, output='html', display_bot=False, display_parcial=True, display_total=True):
+        """
+            Outputs the results of the parsed log file.
+            @display_bot: if set, display bot results.
+            @display_parcial: if set, show info of all games
+            @display_total: if set, show summary info
+        """
         options = {'html': HTMLRender, 'txt': PlainTextRender}
         if output not in options:
             output = 'html'
@@ -455,29 +461,34 @@ class NexuizLogParser:
         title = 'Nexuiz Statistics from log file: %s' % os.path.basename(self.logfile)
         content = {'title': title, 'total_table': '', 'games_tables':''}
         game_number = 0
-        for i, game in sorted(self.games.items(), key=lambda x: x[0]):
-            players = self._filter_and_sort(game['players'].values(), display_bot)
-            if len(players) < 1:
-                continue
-            game_data = game['map_data']
-            game_data['player_stats'] = self._output_players_scores(render, players)
-            game_data['player_vs_player'] = self._output_kills_by_player(render, players)
 
-            if 'teams' in game and game['map_data']['game_type'] == 'ctf':
-                game_data['teams_stats'] = self._output_teams_scores(render, game['teams'])
-            else:
-                game_data['teams_stats'] = ''
+        if display_parcial:
+            for i, game in sorted(self.games.items(), key=lambda x: x[0]):
+                players = self._filter_and_sort(game['players'].values(), display_bot)
+                if len(players) < 1:
+                    continue
+                game_data = game['map_data']
+                game_data['player_stats'] = self._output_players_scores(render, players)
+                game_data['player_vs_player'] = self._output_kills_by_player(render, players)
 
-            content['games_tables'] += render.game(game_data)
-            game_number += 1
+                if 'teams' in game and game['map_data']['game_type'] == 'ctf':
+                    game_data['teams_stats'] = self._output_teams_scores(render, game['teams'])
+                else:
+                    game_data['teams_stats'] = ''
 
-        total_players = self._filter_and_sort(self.total.values(), display_bot)
-        total_data = {
-            'game_number': game_number,
-            'player_stats': self._output_players_scores(render, total_players),
-            'player_vs_player': self._output_kills_by_player(render, total_players),
-        }
-        content['total_table'] = render.total(total_data)
+                content['games_tables'] += render.game(game_data)
+                game_number += 1
+        else:
+            game_number = len(self.games)
+
+        if display_total:
+            total_players = self._filter_and_sort(self.total.values(), display_bot)
+            total_data = {
+                'game_number': game_number,
+                'player_stats': self._output_players_scores(render, total_players),
+                'player_vs_player': self._output_kills_by_player(render, total_players),
+            }
+            content['total_table'] = render.total(total_data)
 
         return render.base(content)
 
@@ -503,7 +514,7 @@ if __name__ == '__main__':
     else:
         filename = options.output
     f = open(filename, 'w')
-    output = nlp.output(display_bot=options.bot, output=options.type)
+    output = nlp.output(display_bot=options.bot, output=options.type, display_total=options.total, display_parcial=options.parcial)
     f.write(output)
     f.close()
 
