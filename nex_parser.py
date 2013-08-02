@@ -29,6 +29,8 @@ HEADER_NAMES = {'name': 'name',
                 'survival_index': 'survival index',
                 'cap_index': 'capture success index',
                 'nemesis': 'nemesis',
+
+                'games_played': 'games played',
                 }
 
 
@@ -339,7 +341,9 @@ class NexuizLogParser:
             for player in game['players'].values():
                 pname = player['name']
                 if pname not in self.total:
-                    self.total[pname] = {'name': pname, 'team': [], 'kills_by_weapon': dict()}
+                    self.total[pname] = {'name': pname, 'team': [], 'kills_by_weapon': dict(), 'games_played': 0}
+
+                self.total[pname]['games_played'] += 1
 
                 for stat in stats:
                     self.total[pname][stat] = self.total[pname].get(stat, 0) + player[stat]
@@ -359,7 +363,6 @@ class NexuizLogParser:
                 self.total[pname]['survival_index'] = self.get_survival_index(self.total[pname])
                 self.total[pname]['cap_index'] = self.get_cap_index(self.total[pname])
                 self.total[pname]['nemesis'] = self.get_nemesis(self.total[pname])
-
 
 
     def _parse_weapon(self, weapon):

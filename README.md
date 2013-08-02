@@ -142,6 +142,8 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'survival_index': float,
                                   'cap_index': float %,
                                   'nemesis': str,
+
+                                  'games_played': int,
                    },
                    player2_name: {...},
                   }
