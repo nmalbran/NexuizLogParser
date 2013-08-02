@@ -54,13 +54,13 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                       'game_type': string,
                          },
                          'teams': {
-                                   team1_id: {
-                                              'id': team1_id,
-                                              'color': string,
-                                              'caps': int,
-                                              'score': int,
+                                   team1_color: {
+                                                 'id': int,
+                                                 'color': string,
+                                                 'caps': int,
+                                                 'score': int,
                                    },
-                                   team2_id: {...},
+                                   team2_color: {...},
                          },
                          'players': {
                                      player1_name: {
@@ -69,6 +69,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'nick': string,
                                                   'name': string,
                                                   'team': ['<team_color> (H:MM:SS)', ...],
+                                                  'last_team': str,
 
                                                   'frags': int,
                                                   'fckills': int,
@@ -152,10 +153,11 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
 
 *Notes*:
 
-- `teamX_id` is the id given by Nexuiz, in string format.
+- `player.id` and `team.id` are the id given by Nexuiz, in string format.
 - `[]['players']['nick']` is the nickname used in that game, while `[]['players']['name']` is the name mapped by `KNOWN_PLAYER_NICKS`.
 - The time in `[]['players']['team']` is when the player joined the team.
 - The top level numbers are the game's number, in order of appearance in the log.
+- `last_team` is the last team which the player joined.
 
 ### Stats definition
 
