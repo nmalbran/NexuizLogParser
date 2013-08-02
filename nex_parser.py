@@ -33,7 +33,7 @@ HEADER_NAMES = {'name': 'name',
 
                 'pweapon': 'preffered weapon',
                 'survival_index': 'survival index',
-                'cap_index': 'capture success index',
+                'cap_index': 'capture success index (%)',
                 'nemesis': 'nemesis',
                 'rag_doll': 'rag doll',
 
@@ -423,7 +423,7 @@ class NexuizLogParser:
         return round((player['frags'] * 1.0) / (player['deaths'] or 1), 2)
 
     def get_cap_index(self, player):
-        return str(round((player['capture'] * 100.0) / ((player['steal'] + player['pickup']) or 1), 1))+ " %"
+        return str(round((player['capture'] * 100.0) / ((player['steal'] + player['pickup']) or 1), 1))
 
     def get_nemesis(self, player):
         ordered_nemesis = sorted(player['deaths_by_player'].items(), key=lambda x:x[1], reverse=True)
