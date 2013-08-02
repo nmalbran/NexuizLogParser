@@ -406,7 +406,7 @@ class NexuizLogParser:
     def get_nemesis(self, player):
         ordered_nemesis = sorted(player['deaths_by_player'].items(), key=lambda x:x[1], reverse=True)
         try:
-            return ordered_nemesis[0][0]
+            return "%s(%d)" % ordered_nemesis[0]
         except IndexError as e:
             return ''
 
