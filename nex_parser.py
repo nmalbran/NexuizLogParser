@@ -29,6 +29,7 @@ HEADER_NAMES = {'name': 'name',
                 'color': 'teams',
                 'caps': 'caps',
                 'score': 'score',
+                'last_players': 'players',
 
                 'pweapon': 'preffered weapon',
                 'survival_index': 'survival index',
@@ -141,7 +142,11 @@ class NexuizLogParser:
 
                         self.games[self.count]['teams'] = dict()
                         for (t_id, team) in self.teams.items():
-                            self.games[self.count]['teams'][team] = {'id': t_id, 'color': team, 'caps': 0, 'score': 0}
+                            self.games[self.count]['teams'][team] = {'id': t_id,
+                                                                     'color': team,
+                                                                     'caps': 0,
+                                                                     'score': 0,
+                                                                     'last_players': []}
 
                     elif not self.in_game:
                         # commands outside a game are discarded
@@ -269,6 +274,7 @@ class NexuizLogParser:
                     elif command_name == "part":
                         # This means: "player_id left the game"
                         player_id = command[1]
+                        self.games[self.count]['players'][players_name[player_id]]['last_team'] = ''
 
                     elif command_name == "labels":
                         subcommand = command[1]
@@ -341,7 +347,11 @@ class NexuizLogParser:
                 for stat, stat_func in self.special_stats.items():
                     self.games[i]['players'][pname][stat] = stat_func(player)
 
+                if player['last_team']:
+                    self.games[i]['teams'][player['last_team']]['last_players'].append(pname)
 
+            for tname, team in game['teams'].items():
+                self.games[i]['teams'][tname]['last_players'] = ", ".join(self.games[i]['teams'][tname]['last_players'])
 
     def _compute_total(self):
         stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']

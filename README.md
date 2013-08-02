@@ -59,6 +59,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                  'color': string,
                                                  'caps': int,
                                                  'score': int,
+                                                 'last_players': str,
                                    },
                                    team2_color: {...},
                          },
@@ -154,10 +155,11 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
 *Notes*:
 
 - `player.id` and `team.id` are the id given by Nexuiz, in string format.
-- `[]['players']['nick']` is the nickname used in that game, while `[]['players']['name']` is the name mapped by `KNOWN_PLAYER_NICKS`.
-- The time in `[]['players']['team']` is when the player joined the team.
+- `players.nick` is the nickname used in that game, while `players.name` is the name mapped by `KNOWN_PLAYER_NICKS`.
+- The time in `players.team` is when the player joined the team.
 - The top level numbers are the game's number, in order of appearance in the log.
-- `last_team` is the last team which the player joined.
+- `player.last_team` is the last team which the player joined.
+- `team.last_players` are the players according to `player.last_team`
 
 ### Stats definition
 
