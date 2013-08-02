@@ -425,11 +425,14 @@ class NexuizLogParser:
 
         return sorted([p for p in players if valid(p)], key=lambda x: x['name'])
 
-    def _output_players_scores(self, render, players):
-        output = render.game_table_header()
+    def _output_players_scores(self, render, players, table='game'):
+        header = {'total':render.total_table_header, 'game': render.game_table_header}
+        row = {'total':render.total_table_row, 'game': render.game_table_row}
+
+        output = header[table]()
         for player in players:
             player['teams'] = ', '.join(player['team'])
-            output += render.game_table_row(player)
+            output += row[table](player)
         return output
 
     def _output_kills_by_player(self, render, players):
@@ -473,7 +476,7 @@ class NexuizLogParser:
                 if len(players) < 1:
                     continue
                 game_data = game['map_data']
-                game_data['player_stats'] = self._output_players_scores(render, players)
+                game_data['player_stats'] = self._output_players_scores(render, players, table='game')
                 game_data['player_vs_player'] = self._output_kills_by_player(render, players)
 
                 if 'teams' in game and game['map_data']['game_type'] == 'ctf':
@@ -490,7 +493,7 @@ class NexuizLogParser:
             total_players = self._filter_and_sort(self.total.values(), display_bot)
             total_data = {
                 'game_number': game_number,
-                'player_stats': self._output_players_scores(render, total_players),
+                'player_stats': self._output_players_scores(render, total_players, table='total'),
                 'player_vs_player': self._output_kills_by_player(render, total_players),
             }
             content['total_table'] = render.total(total_data)

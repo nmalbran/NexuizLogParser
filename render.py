@@ -2,8 +2,8 @@
 
 TEMPLATE_FOLDER = 'html_templates/'
 SEP = "=" * 80 + "\n"
-STR_FORMAT_BASE = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s\n"]
-
+STR_GAME_ROW = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s\n"]
+STR_TOTAL_ROW = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s\n"]
 
 class BaseRender(object):
 
@@ -54,6 +54,7 @@ class HTMLRender(BaseRender):
         self.game_t = open(TEMPLATE_FOLDER + 'game.html').read()
         self.player_row_t = open(TEMPLATE_FOLDER + 'player_row.html').read()
         self.team_row_t = open(TEMPLATE_FOLDER + 'team_row.html').read()
+        self.total_row_t = open(TEMPLATE_FOLDER + 'total_row.html').read()
         self.total_t = open(TEMPLATE_FOLDER + 'total.html').read()
         self.css = open(TEMPLATE_FOLDER + 'style.css').read()
         self.header_css = 'header'
@@ -73,6 +74,12 @@ class HTMLRender(BaseRender):
 
     def game_table_row(self, player):
         return self.player_row_t % dict(player, css='')
+
+    def total_table_header(self):
+        return self.total_row_t % dict(self.header_names, css=self.header_css)
+
+    def total_table_row(self, player):
+        return self.total_row_t % dict(player, css='')
 
     def kills_by_player_table_header(self, players_name):
         header = "<tr class='" + self.header_css + "'><td>%(killervskilled)s</td>" % self.header_names
@@ -100,7 +107,8 @@ class PlainTextRender(BaseRender):
         super(PlainTextRender, self).__init__(uppercased_names, **kwargs)
         lnl = kwargs['lnl']
         fcl = str(max(lnl, 4) + 1)
-        self.player_row = STR_FORMAT_BASE[0] + fcl + STR_FORMAT_BASE[1]
+        self.player_row = STR_GAME_ROW[0] + fcl + STR_GAME_ROW[1]
+        self.total_row = STR_TOTAL_ROW[0] + fcl + STR_TOTAL_ROW[1]
         self.kills_by_player_row_base = "  %"+str(lnl)+"s"
 
 
@@ -109,6 +117,12 @@ class PlainTextRender(BaseRender):
 
     def game_table_row(self, player):
         return self.player_row % player
+
+    def total_table_header(self):
+        return self.total_row % self.header_names
+
+    def total_table_row(self, player):
+        return self.total_row % player
 
     def game(self, game_data):
         output  = SEP
