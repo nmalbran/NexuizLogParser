@@ -426,19 +426,19 @@ class NexuizLogParser:
         return sorted([p for p in players if valid(p)], key=lambda x: x['name'])
 
     def _output_players_scores(self, render, players):
-        output = render.table_row_header()
+        output = render.game_table_header()
         for player in players:
             player['teams'] = ', '.join(player['team'])
-            output += render.table_row_player(player)
+            output += render.game_table_row(player)
         return output
 
     def _output_kills_by_player(self, render, players):
-        output = render.kills_by_player_header([p['name'] for p in players])
+        output = render.kills_by_player_table_header([p['name'] for p in players])
         for killer in players:
             line = [killer['name']]
             for killed in players:
                 line.append(killer['kills_by_player'].get(killed['name'], 0))
-            output += render.kills_by_player_row(line)
+            output += render.kills_by_player_table_row(line)
         return output
 
     def _output_teams_scores(self, render, teams):
