@@ -60,12 +60,12 @@ class NexuizLogParser:
         """
         self.in_game = False
         self.count = 0
-        self.line_number = 0
         self.games = dict()
         self.player_nicks = set()
         self.info = []
         self.total = dict()
         self.logfile_list = []
+        self.logline = ''
 
 
     def is_bot(self, name):
@@ -78,7 +78,7 @@ class NexuizLogParser:
                 return name
         if nick not in self.player_nicks:
             self.player_nicks.add(nick)
-            self.info.append("Nick not recognized (line: %d): '%s': ['%s']" % (self.line_number, nick, repr(nick)))
+            self.info.append("%s Nick not recognized: '%s': ['%s']" % (self.logline, nick, repr(nick)))
         return 'UNKNOWN'
 
 
@@ -103,9 +103,10 @@ class NexuizLogParser:
         self.logfile_list = logfile_list
         players_name = dict()
         for logfile in logfile_list:
-            self.line_number = 0
+            line_number = 0
             for line in open(logfile):
-                self.line_number += 1
+                line_number += 1
+                self.logline = "%s:%d :" % (logfile, line_number)
 
                 if (len(line) > 25) and (line[24] == ":"):
                     timestamp = line[3:22]
@@ -147,7 +148,7 @@ class NexuizLogParser:
                             mutators = command[2:]
                         else:
                             # just to discover other gameinfo log lines
-                            self.info.append('gameinfo subcommand not recognized (line %d):' % line_number)
+                            self.info.append('%s gameinfo subcommand not recognized:' % self.logline)
                             self.info.append(command)
 
                     elif command_name == "scores":
@@ -230,7 +231,7 @@ class NexuizLogParser:
                         elif text == "tk":         # TeamMate kill
                             self.games[self.count]['players'][killer]['tk'] += 1
                         else:
-                            self.info.append('kill text not recognized for command (line %d):' % self.line_number)
+                            self.info.append('%s kill text not recognized for command:' % self.logline)
                             self.info.append(command)
 
                     elif command_name == "ctf":
@@ -253,7 +254,7 @@ class NexuizLogParser:
                             player_id = command[3]
                             self.games[self.count]['players'][players_name[player_id]][subcommand] += 1
                         else:
-                            self.info.append('ctf subcommand not recognized (line %d):' % self.line_number)
+                            self.info.append('%s ctf subcommand not recognized:' % self.logline)
                             self.info.append(command)
 
                     elif command_name == "part":
@@ -267,7 +268,7 @@ class NexuizLogParser:
                         elif subcommand == "teamscores":
                             pass
                         else:
-                            self.info.append('labels subcommand not recognized (line %d):' % self.line_number)
+                            self.info.append('%s labels subcommand not recognized:' % self.logline)
                             self.info.append(command)
 
                     elif command_name == "player":
@@ -310,7 +311,7 @@ class NexuizLogParser:
 
                     else:
                         # This is to show any unknown command
-                        self.info.append('main command not recognized (line %d):' % line_number)
+                        self.info.append('%s main command not recognized:' % self.logline)
                         self.info.append(command)
 
         self._clean_games()
@@ -377,7 +378,7 @@ class NexuizLogParser:
 
         weapon_id = int(weapon_id)
         if weapon_id not in WEAPONS:
-            self.info.append("Unknown weapon id: Line Number: %d, Weapon: %s" % (self.line_number, weapon))
+            self.info.append("%s Unknown weapon id: %s" % (self.logline, weapon))
             weapon_str = 'new weapon'
         else:
             weapon_str = WEAPONS[weapon_id]
@@ -385,7 +386,7 @@ class NexuizLogParser:
         clean_mod = ''
         for m in weapon_mod:
             if m not in WEAPON_MOD:
-                self.info.append("Unknown weapon mod: Line Number: %d, Weapon: %s" % (self.line_number, weapon))
+                self.info.append("%s Unknown weapon mod: %s" % (self.logline, weapon))
             else:
                 clean_mod += m
 
