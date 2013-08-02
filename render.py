@@ -56,11 +56,13 @@ class HTMLRender(BaseRender):
         self.team_row_t = open(TEMPLATE_FOLDER + 'team_row.html').read()
         self.total_row_t = open(TEMPLATE_FOLDER + 'total_row.html').read()
         self.total_t = open(TEMPLATE_FOLDER + 'total.html').read()
-        self.css = open(TEMPLATE_FOLDER + 'style.css').read()
         self.header_css = 'header'
 
     def base(self, base_data):
-        return self.base_t % dict(base_data, css=self.css)
+        css = open(TEMPLATE_FOLDER + 'style.css').read()
+        js = open(TEMPLATE_FOLDER + 'sorttable.js').read()
+
+        return self.base_t % dict(base_data, css=css, js=js)
 
     def game(self, game_data):
         return self.game_t % game_data

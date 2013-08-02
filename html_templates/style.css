@@ -36,6 +36,11 @@ table tr.header td{
     text-transform: capitalize;
 }
 
+table.sortable tr.header td:hover{
+    cursor: pointer;
+    background: #AAAAFF;
+}
+
 td.text{
     text-align: left;
 }
