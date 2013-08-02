@@ -46,6 +46,10 @@ tr td:first-child{
     text-align: left;
 }
 
+td.sep-right{
+    border-right: 1px solid black;
+}
+
 .map td:first-child{
     border-right: 0;
 }

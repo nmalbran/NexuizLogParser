@@ -9,14 +9,18 @@ from render import HTMLRender, PlainTextRender
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 HEADER_NAMES = {'name': 'name',
                 'frags': 'frags',
+                'fckills': 'fc kills',
+                'tk': 'team kill',
+                'deaths': 'deaths',
                 'suicide': 'suicides',
                 'accident': 'accidents',
-                'tk': 'team kill',
-                'fckills': 'fc kills',
-                'deaths': 'deaths',
+
                 'capture': 'caps',
                 'steal': 'steals',
                 'pickup': 'pickups',
+                'return': 'return',
+                'dropped': 'dropped',
+
                 'teams': 'team',
 
                 'killervskilled': 'killer',
