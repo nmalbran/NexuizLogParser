@@ -100,6 +100,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'survival_index': float,
                                                   'cap_index': float %,
                                                   'nemesis': str,
+                                                  'rag_doll': str,
                                      },
                                      player2_name: {...},
                          }
@@ -142,6 +143,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'survival_index': float,
                                   'cap_index': float %,
                                   'nemesis': str,
+                                  'rag_doll': str,
 
                                   'games_played': int,
                    },
@@ -161,3 +163,4 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
 - `survival_index`: `frags / deaths`
 - `cap_index`: `capture *100 / (steal + pickup)`%
 - `nemesis`: The name of the player who killed most times this player
+- `rag_doll`: The name of the player killed most time by this player

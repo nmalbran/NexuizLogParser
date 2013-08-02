@@ -33,6 +33,7 @@ HEADER_NAMES = {'name': 'name',
                 'survival_index': 'survival index',
                 'cap_index': 'capture success index',
                 'nemesis': 'nemesis',
+                'rag_doll': 'rag doll',
 
                 'games_played': 'games played',
                 }
@@ -55,6 +56,7 @@ class NexuizLogParser:
             'survival_index': self.get_survival_index,
             'cap_index': self.get_cap_index,
             'nemesis': self.get_nemesis,
+            'rag_doll': self.get_rag_doll,
         }
 
 
@@ -368,6 +370,7 @@ class NexuizLogParser:
                 self.total[pname]['survival_index'] = self.get_survival_index(self.total[pname])
                 self.total[pname]['cap_index'] = self.get_cap_index(self.total[pname])
                 self.total[pname]['nemesis'] = self.get_nemesis(self.total[pname])
+                self.total[pname]['rag_doll'] = self.get_rag_doll(self.total[pname])
 
 
     def _parse_weapon(self, weapon):
@@ -411,6 +414,13 @@ class NexuizLogParser:
         ordered_nemesis = sorted(player['deaths_by_player'].items(), key=lambda x:x[1], reverse=True)
         try:
             return "%s(%d)" % ordered_nemesis[0]
+        except IndexError as e:
+            return ''
+
+    def get_rag_doll(self, player):
+        ordered_rag_doll = sorted(player['kills_by_player'].items(), key=lambda x:x[1], reverse=True)
+        try:
+            return "%s(%d)" % ordered_rag_doll[0]
         except IndexError as e:
             return ''
 
