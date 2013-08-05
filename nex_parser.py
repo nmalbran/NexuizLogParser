@@ -105,6 +105,13 @@ class NexuizLogParser:
         return self.total
 
 
+    def get_average(self):
+        """
+            Return a dictionary with summary of all games in the log, in average per game.
+        """
+        return self.average
+
+
     def parse_log(self, logfile_list):
         """
             Parse the log in `logfile`.

@@ -110,6 +110,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                      1: {...},
                     }
 
+    get_average()
     get_total() = {
                    player1_name: {
                                   'name': string,
