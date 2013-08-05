@@ -231,9 +231,9 @@ class NexuizLogParser:
                         killed = players_name[killed]
                         self.games[self.count]['players'][killed]['deaths'] += 1
 
-                        killer_weapon, killer_mod = self._parse_weapon(other_data[1][6:])
+                        killer_weapon, killer_mod = self._parse_weapon(other_data[1][6:], killer, killed)
                         if text in ['frag', 'tk']:
-                            killed_weapon, killed_mod = self._parse_weapon(other_data[2][12:])
+                            killed_weapon, killed_mod = self._parse_weapon(other_data[2][12:], killer, killed)
 
                         self.games[self.count]['players'][killer]['kills_by_weapon'][killer_weapon] = self.games[self.count]['players'][killer]['kills_by_weapon'].get(killer_weapon, 0) + 1
 
@@ -419,7 +419,7 @@ class NexuizLogParser:
                 self.average[pname][stat] = stat_func(self.average[pname])
 
 
-    def _parse_weapon(self, weapon):
+    def _parse_weapon(self, weapon, killer='', killed=''):
         weapon_id = ''
         weapon_mod = ''
         for c in weapon:
@@ -431,7 +431,7 @@ class NexuizLogParser:
 
         weapon_id = int(weapon_id)
         if weapon_id not in WEAPONS:
-            self.info.append("%s Unknown weapon id: %s" % (self.logline, weapon))
+            self.info.append("%s Unknown weapon id: %s, map: %s (%s -> %s)" % (self.logline, weapon, self.games[self.count]['map_data']['map_name'], killer, killed))
             weapon_str = 'new weapon'
         else:
             weapon_str = WEAPONS[weapon_id]
@@ -439,7 +439,7 @@ class NexuizLogParser:
         clean_mod = ''
         for m in weapon_mod:
             if m not in WEAPON_MOD:
-                self.info.append("%s Unknown weapon mod: %s" % (self.logline, weapon))
+                self.info.append("%s Unknown weapon mod: %s, map: %s (%s -> %s)" % (self.logline, weapon, self.games[self.count]['map_data']['map_name'], killer, killed))
             else:
                 clean_mod += m
 
