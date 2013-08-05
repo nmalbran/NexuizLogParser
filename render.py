@@ -75,7 +75,8 @@ class HTMLRender(BaseRender):
         return self.player_row_t % dict(self.header_names, css=self.header_css)
 
     def game_table_row(self, player):
-        return self.player_row_t % dict(player, css='')
+        css = "%s-t" % player['last_team'].lower()
+        return self.player_row_t % dict(player, css=css)
 
     def total_table_header(self):
         return self.total_row_t % dict(self.header_names, css=self.header_css)
@@ -96,7 +97,8 @@ class HTMLRender(BaseRender):
         return self.team_row_t % dict(self.header_names, css=self.header_css)
 
     def teams_table_row(self, team):
-        return self.team_row_t % dict(team, css='')
+        css = "%s-t" % team['color'].lower()
+        return self.team_row_t % dict(team, css=css)
 
     def _standard_row(self, data, css=''):
         return "<tr class='%s'>%s</tr>" % (css, ''.join(["<td>%s</td>" % d for d in data]))

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 from datetime import datetime
 from optparse import OptionParser
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
@@ -594,9 +595,11 @@ if __name__ == '__main__':
     nlp.parse_log(args)
 
     if not options.output:
-        filename = 'parsedlog.%s' % options.type
+        filename = '%s-stats.%s' % (time.strftime("%Y%m%d"), options.type)
     else:
         filename = options.output
+    print "Output to: %s\n" % filename
+
     f = open(filename, 'w')
     output = nlp.output(display_bot=options.bot, output=options.type, display_total=options.total, display_parcial=options.parcial)
     f.write(output)

@@ -45,6 +45,7 @@ KNOWN_PLAYER_NICKS ={
               'RAKESH-dator - GIMME YOUR PASSPORTS FUCKING SLAVES!',
               'ricardator'],
 'Francisco': ['[FS]Slaughter',],
+'Cristian': ['Cchavez',],
 'Unknown':   [''],
 
 ########

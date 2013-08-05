@@ -1,3 +1,4 @@
+
 #container{
     width: 100%;
     margin: 0 auto;
@@ -18,6 +19,7 @@ table{
     border: 1px solid black;
     margin: 0.5em;
     border-collapse:collapse;
+    font-size: 0.7em;
 }
 
 table tr.header{
@@ -59,8 +61,16 @@ td.sep-right{
     border-right: 0;
 }
 
+tr.blue-t{
+    background: #DDDDFF;
+}
+
+tr.red-t{
+    background: #FFDDDD;
+}
+
 tr:hover{
-    background: #DDDDDD;
+    background: #FFFFFF;
 }
 
 .game{
