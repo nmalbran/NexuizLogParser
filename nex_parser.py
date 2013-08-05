@@ -46,11 +46,12 @@ HEADER_NAMES = {'name': 'name',
 
 class NexuizLogParser:
 
-    def __init__(self, known_player_nicks, teams=TEAM_COLOR, average_precision=2):
+    def __init__(self, known_player_nicks, teams=TEAM_COLOR, average_precision=2, min_players_per_game=3):
         self.reset()
         self.known_player_nicks = known_player_nicks
         self.teams = teams
         self.average_precision = average_precision
+        self.min_players_per_game = min_players_per_game
 
         self.longest_name_length = {
             True: max([len(p) for p in known_player_nicks.keys()]), # display_bot = True
@@ -359,6 +360,10 @@ class NexuizLogParser:
         for i, game in self.games.items():
             if 'players' not in game:
                 del self.games[i]
+            else:
+                players = [p for p in game['players'].keys() if not self.is_bot(p)]
+                if len(players) < self.min_players_per_game:
+                    del self.games[i]
 
 
     def _compute_extra_stats(self):
