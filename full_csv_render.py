@@ -24,7 +24,7 @@ class FullCSVRender():
         output = "%s\n" % ','.join(all_keys)
 
         for p in players:
-            if self.is_bot(p['name']):
+            if self.is_bot(p['name']) or p['name'] in ['Alfonso', 'Carlos']:
                 continue
             line = ''
             for key in all_keys:
@@ -40,6 +40,7 @@ class FullCSVRender():
     def _flatten_players(self):
         for pname in self.players:
             for p in self.all_players:
+                continue
                 self.players[pname]["kills_by_%s" % p] = self.players[pname]['kills_by_player'].get(p, 0)
                 self.players[pname]["deaths_by_%s" % p] = self.players[pname]['deaths_by_player'].get(p, 0)
 
@@ -51,7 +52,7 @@ class FullCSVRender():
             del self.players[pname]['kills_by_weapon']
 
     def _clean_keys(self):
-        delete_keys = ['team', 'nemesis', 'rag_doll', 'pweapon', 'deaths_by_Unknown']
+        delete_keys = ['team', 'nemesis', 'rag_doll', 'pweapon']
         for pname in self.players:
             for key in delete_keys:
                 del self.players[pname][key]

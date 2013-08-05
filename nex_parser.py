@@ -401,7 +401,7 @@ class NexuizLogParser:
         stats_by_something = ['kills_by_player', 'deaths_by_player', 'kills_by_weapon']
 
         def av(val, tot):
-            return round(val * 1.0 / tot, 2)
+            return round(val * 1.0 / tot, 4)
 
         for pname, player in self.total.items():
             num = player['games_played']
