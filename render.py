@@ -2,8 +2,8 @@
 
 TEMPLATE_FOLDER = 'html_templates/'
 SEP = "=" * 80 + "\n"
-STR_GAME_ROW = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s\n"]
-STR_TOTAL_ROW = ["%(name)", "s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s\n"]
+STR_GAME_ROW = ["%(name)", "s  %(score)5s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s\n"]
+STR_TOTAL_ROW = ["%(name)", "s  %(score)5s  %(frags)5s  %(fckills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s\n"]
 
 class BaseRender(object):
 

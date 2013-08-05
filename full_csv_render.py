@@ -61,7 +61,7 @@ class FullCSVRender():
 
 if __name__ == '__main__':
 
-    nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
+    nlp = NexuizLogParser(KNOWN_PLAYER_NICKS, average_precision=4)
     nlp.parse_log(sys.argv[1:])
 
     average = nlp.get_average()

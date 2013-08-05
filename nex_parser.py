@@ -21,6 +21,8 @@ HEADER_NAMES = {'name': 'name',
                 'return': 'return',
                 'dropped': 'dropped',
 
+                'score': 'score',
+
                 'teams': 'team',
                 'last_team': 'last team',
 
@@ -43,10 +45,11 @@ HEADER_NAMES = {'name': 'name',
 
 class NexuizLogParser:
 
-    def __init__(self, known_player_nicks, teams=TEAM_COLOR):
+    def __init__(self, known_player_nicks, teams=TEAM_COLOR, average_precision=2):
         self.reset()
         self.known_player_nicks = known_player_nicks
         self.teams = teams
+        self.average_precision = average_precision
 
         self.longest_name_length = {
             True: max([len(p) for p in known_player_nicks.keys()]), # display_bot = True
@@ -206,6 +209,8 @@ class NexuizLogParser:
                                                                             'deaths': 0,
                                                                             'fckills': 0,
 
+                                                                            'score': 0,
+
                                                                             'kills_by_player': dict(),
                                                                             'deaths_by_player': dict(),
                                                                             'kills_by_weapon': dict(),
@@ -296,7 +301,12 @@ class NexuizLogParser:
 
                     elif command_name == "player":
                         # final stats for player
-                        player_stats = command[2:]
+                        player_stats = command[2]
+                        player_id = command[5]
+                        team_id = command[4]
+                        player_score = int(player_stats.split(',')[0])
+
+                        self.games[self.count]['players'][players_name[player_id]]['score'] = player_score
 
                     elif command_name == "teamscores":
                         # final stats for teams
@@ -363,7 +373,7 @@ class NexuizLogParser:
                 self.games[i]['teams'][tname]['last_players'] = ", ".join(self.games[i]['teams'][tname]['last_players'])
 
     def _compute_total(self):
-        stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']
+        stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup', 'score']
         stats_by_player = ['kills_by_player', 'deaths_by_player']
         for game in self.games.values():
             if 'players' not in game:
@@ -397,11 +407,11 @@ class NexuizLogParser:
                 self.total[pname]['rag_doll'] = self.get_rag_doll(self.total[pname])
 
     def _compute_average(self):
-        stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup']
+        stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup', 'score']
         stats_by_something = ['kills_by_player', 'deaths_by_player', 'kills_by_weapon']
 
         def av(val, tot):
-            return round(val * 1.0 / tot, 4)
+            return round(val * 1.0 / tot, self.average_precision)
 
         for pname, player in self.total.items():
             num = player['games_played']
