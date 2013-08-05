@@ -73,7 +73,14 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'last_team': str,
 
                                                   'frags': int,
-                                                  'fckills': int,
+                                                  'fc_kills': int,
+                                                  'sc_kills': int,
+                                                  'ic_kills': int,
+
+                                                  'kills_wf': int,
+                                                  'kills_ws': int,
+                                                  'kills_wi': int,
+
                                                   'tk': int,
                                                   'deaths': int,
                                                   'suicide': int,
@@ -117,7 +124,13 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'team': [],
 
                                   'frags': int,
-                                  'fckills': int,
+                                  'fc_kills': int,
+                                  'sc_kills': int,
+                                  'ic_kills': int,
+
+                                  'kills_wf': int,
+                                  'kills_ws': int,
+                                  'kills_wi': int,
                                   'tk': int,
                                   'deaths': int,
                                   'suicide': int,

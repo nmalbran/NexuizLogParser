@@ -10,11 +10,18 @@ from render import HTMLRender, PlainTextRender
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 HEADER_NAMES = {'name': 'name',
                 'frags': 'frags',
-                'fckills': 'fc kills',
+                'fc_kills': 'fc kills',
                 'tk': 'team kill',
                 'deaths': 'deaths',
                 'suicide': 'suicides',
                 'accident': 'accidents',
+
+                'sc_kills': 'strength kills',
+                'ic_kills': 'shield kills',
+
+                'kills_wf': 'kills w/ flag',
+                'kills_ws': 'kills w/ strength',
+                'kills_wi': 'kills w/ shield',
 
                 'capture': 'caps',
                 'steal': 'steals',
@@ -209,7 +216,13 @@ class NexuizLogParser:
                                                                             'accident': 0,
                                                                             'tk': 0,
                                                                             'deaths': 0,
-                                                                            'fckills': 0,
+                                                                            'fc_kills': 0,
+                                                                            'sc_kills': 0,
+                                                                            'ic_kills': 0,
+
+                                                                            'kills_wf': 0,
+                                                                            'kills_ws': 0,
+                                                                            'kills_wi': 0,
 
                                                                             'score': 0,
 
@@ -250,7 +263,18 @@ class NexuizLogParser:
                             self.games[self.count]['players'][killed]['deaths_by_player'][killer] = self.games[self.count]['players'][killed]['deaths_by_player'].get(killer, 0) + 1
 
                             if FLAG in killed_mod:
-                                self.games[self.count]['players'][killer]['fckills'] += 1
+                                self.games[self.count]['players'][killer]['fc_kills'] += 1
+                            if SHIELD in killed_mod:
+                                self.games[self.count]['players'][killer]['ic_kills'] += 1
+                            if STRENGTH in killed_mod:
+                                self.games[self.count]['players'][killer]['sc_kills'] += 1
+
+                            if FLAG in killer_mod:
+                                self.games[self.count]['players'][killer]['kills_wf'] += 1
+                            if SHIELD in killer_mod:
+                                self.games[self.count]['players'][killer]['kills_wi'] += 1
+                            if STRENGTH in killer_mod:
+                                self.games[self.count]['players'][killer]['kills_ws'] += 1
 
 
                         elif text == "suicide":    # kill himself, by weapon
@@ -379,7 +403,7 @@ class NexuizLogParser:
                 self.games[i]['teams'][tname]['last_players'] = ", ".join(self.games[i]['teams'][tname]['last_players'])
 
     def _compute_total(self):
-        stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup', 'score']
+        stats = ['frags', 'suicide', 'accident', 'tk', 'fc_kills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup', 'score', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi']
         stats_by_player = ['kills_by_player', 'deaths_by_player']
         for game in self.games.values():
             if 'players' not in game:
@@ -413,7 +437,7 @@ class NexuizLogParser:
                 self.total[pname]['rag_doll'] = self.get_rag_doll(self.total[pname])
 
     def _compute_average(self):
-        stats = ['frags', 'suicide', 'accident', 'tk', 'fckills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup', 'score']
+        stats = ['frags', 'suicide', 'accident', 'tk', 'fc_kills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup', 'score', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi']
         stats_by_something = ['kills_by_player', 'deaths_by_player', 'kills_by_weapon']
 
         def av(val, tot):
