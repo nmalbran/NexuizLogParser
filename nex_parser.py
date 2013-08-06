@@ -8,17 +8,19 @@ from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
 from render import HTMLRender, PlainTextRender
 
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
-HEADER_NAMES = {'name': 'name',
+OPPOSITE_TEAM = {'5': 'Blue', '14': 'Red'}
+HEADER_NAMES = {
+            # Players Stats Table
+                'name': 'name',
                 'frags': 'frags',
-                'fc_kills': 'fc kills',
                 'tk': 'team kill',
                 'deaths': 'deaths',
                 'suicide': 'suicides',
                 'accident': 'accidents',
 
+                'fc_kills': 'fc kills',
                 'sc_kills': 'strength kills',
                 'ic_kills': 'shield kills',
-
                 'kills_wf': 'kills w/ flag',
                 'kills_ws': 'kills w/ strength',
                 'kills_wi': 'kills w/ shield',
@@ -30,16 +32,10 @@ HEADER_NAMES = {'name': 'name',
                 'dropped': 'dropped',
 
                 'score': 'score',
+                'games_played': 'games played',
 
                 'teams': 'team',
                 'last_team': 'last team',
-
-                'killervskilled': 'killer',
-
-                'color': 'teams',
-                'caps': 'caps',
-                'score': 'score',
-                'last_players': 'players',
 
                 'pweapon': 'preffered weapon',
                 'survival_index': 'survival index',
@@ -47,7 +43,16 @@ HEADER_NAMES = {'name': 'name',
                 'nemesis': 'nemesis',
                 'rag_doll': 'rag doll',
 
-                'games_played': 'games played',
+            # Players vs Players Table
+                'killervskilled': 'killer',
+
+            # Teams Stats Table
+                'color': 'teams',
+                'caps': 'caps',
+                'score': 'score',
+                'last_players': 'players',
+                'captures': 'captures log',
+
                 }
 
 
@@ -175,7 +180,9 @@ class NexuizLogParser:
                                                                      'color': team,
                                                                      'caps': 0,
                                                                      'score': 0,
-                                                                     'last_players': []}
+                                                                     'last_players': [],
+                                                                     'captures_log': [],
+                                                                    }
 
                     elif not self.in_game:
                         # commands outside a game are discarded
@@ -297,6 +304,10 @@ class NexuizLogParser:
                              subcommand == "pickup"):
                             player_id = command[3]
                             self.games[self.count]['players'][players_name[player_id]][subcommand] += 1
+
+                            if subcommand == "capture":
+                                capture_time = gametime - self.games[self.count]['map_data']['start_time']
+                                self.games[self.count]['teams'][OPPOSITE_TEAM[team_id]]['captures_log'].append((capture_time, players_name[player_id]))
                         else:
                             self.info.append('%s ctf subcommand not recognized:' % self.logline)
                             self.info.append(command)
@@ -539,6 +550,7 @@ class NexuizLogParser:
     def _output_teams_scores(self, render, teams):
         output = render.teams_table_header()
         for team in teams.values():
+            team['captures'] = ', '.join(["%s(%s)" % cl for cl in team['captures_log']])
             output += render.teams_table_row(team)
         return output
 
