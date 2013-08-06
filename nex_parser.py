@@ -51,6 +51,15 @@ HEADER_NAMES = {'name': 'name',
                 }
 
 
+NUMERIC_STATS = ['score', 'frags', 'tk', 'fc_kills', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi',
+                 'deaths', 'suicide', 'accident',
+                 'capture', 'return', 'steal', 'dropped', 'pickup',
+                ]
+
+STATS_BY_PLAYER = ['kills_by_player', 'deaths_by_player']
+STATS_BY_WEAPON = ['kills_by_weapon', ]
+
+
 class NexuizLogParser:
 
     def __init__(self, known_player_nicks, teams=TEAM_COLOR, average_precision=2, min_players_per_game=3):
@@ -211,30 +220,12 @@ class NexuizLogParser:
                                                                             'team': [],
                                                                             'last_team': '',
 
-                                                                            'frags': 0,
-                                                                            'suicide': 0,
-                                                                            'accident': 0,
-                                                                            'tk': 0,
-                                                                            'deaths': 0,
-                                                                            'fc_kills': 0,
-                                                                            'sc_kills': 0,
-                                                                            'ic_kills': 0,
-
-                                                                            'kills_wf': 0,
-                                                                            'kills_ws': 0,
-                                                                            'kills_wi': 0,
-
-                                                                            'score': 0,
-
                                                                             'kills_by_player': dict(),
                                                                             'deaths_by_player': dict(),
                                                                             'kills_by_weapon': dict(),
-
-                                                                            'capture': 0,
-                                                                            'return': 0,
-                                                                            'steal': 0,
-                                                                            'dropped': 0,
-                                                                            'pickup': 0,}
+                                                                            }
+                            for stat in NUMERIC_STATS:
+                                self.games[self.count]['players'][player_name][stat] = 0
 
                     elif command_name == "team":
                         player_id , team_id = command[1:]
@@ -403,8 +394,6 @@ class NexuizLogParser:
                 self.games[i]['teams'][tname]['last_players'] = ", ".join(self.games[i]['teams'][tname]['last_players'])
 
     def _compute_total(self):
-        stats = ['frags', 'suicide', 'accident', 'tk', 'fc_kills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup', 'score', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi']
-        stats_by_player = ['kills_by_player', 'deaths_by_player']
         for game in self.games.values():
             if 'players' not in game:
                 continue
@@ -416,10 +405,10 @@ class NexuizLogParser:
 
                 self.total[pname]['games_played'] += 1
 
-                for stat in stats:
+                for stat in NUMERIC_STATS:
                     self.total[pname][stat] = self.total[pname].get(stat, 0) + player[stat]
 
-                for stat in stats_by_player:
+                for stat in STATS_BY_PLAYER:
                     if stat not in self.total[pname]:
                         self.total[pname][stat] = dict()
 
@@ -437,8 +426,7 @@ class NexuizLogParser:
                 self.total[pname]['rag_doll'] = self.get_rag_doll(self.total[pname])
 
     def _compute_average(self):
-        stats = ['frags', 'suicide', 'accident', 'tk', 'fc_kills', 'deaths', 'capture', 'return', 'steal', 'dropped', 'pickup', 'score', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi']
-        stats_by_something = ['kills_by_player', 'deaths_by_player', 'kills_by_weapon']
+        stats_by_something = STATS_BY_PLAYER + STATS_BY_WEAPON
 
         def av(val, tot):
             return round(val * 1.0 / tot, self.average_precision)
@@ -447,7 +435,7 @@ class NexuizLogParser:
             num = player['games_played']
             self.average[pname] = {'name': pname, 'team':[], 'games_played': num}
 
-            for stat in stats:
+            for stat in NUMERIC_STATS:
                 self.average[pname][stat] = av(player[stat], num)
 
             for stat in stats_by_something:
