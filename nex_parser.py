@@ -2,7 +2,7 @@
 
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from optparse import OptionParser
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
 from ctf_strs import RETURNED, CAPTURE, RETURN, STEAL, DROPPED, PICKUP
@@ -10,6 +10,7 @@ from render import HTMLRender, PlainTextRender
 
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 OPPOSITE_TEAM = {'5': 'Blue', '14': 'Red'}
+START_DELAY_TIME = timedelta(seconds=15)
 HEADER_NAMES = {
             # Players Stats Table
                 'name': 'name',
@@ -63,7 +64,6 @@ NUMERIC_STATS = ['score', 'frags', 'tk', 'fc_kills', 'sc_kills', 'ic_kills', 'ki
                  'deaths', 'suicide', 'accident',
                  CAPTURE, RETURN, STEAL, DROPPED, PICKUP, 'cap_by_steal', 'cap_by_pickup',
                 ]
-
 STATS_BY_PLAYER = ['kills_by_player', 'deaths_by_player']
 STATS_BY_WEAPON = ['kills_by_weapon', ]
 
@@ -174,7 +174,7 @@ class NexuizLogParser:
                         self.in_game = True
                         self.games[self.count] = dict()
                         self.games[self.count]['map_data'] = {'map_name': map_name,
-                                                              'start_time': gametime,
+                                                              'start_time': gametime + START_DELAY_TIME,
                                                               'duration': '',
                                                               'game_type': game_type,
                                                               }
