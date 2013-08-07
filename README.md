@@ -60,6 +60,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                  'caps': int,
                                                  'score': int,
                                                  'last_players': str,
+                                                 'captures_log': [(time,  player_name), ...],
                                    },
                                    team2_color: {...},
                          },
