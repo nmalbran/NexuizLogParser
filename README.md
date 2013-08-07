@@ -87,6 +87,10 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'suicide': int,
                                                   'accident': int,
 
+                                                  'killing_spree': [int, int, ...],
+                                                  'n_killing_spree': int,
+                                                  'max_killing_spree': int,
+
                                                   'kills_by_player': {
                                                                       player1_name: int,
                                                                       player2_name: int,
@@ -136,6 +140,9 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'deaths': int,
                                   'suicide': int,
                                   'accident': int,
+
+                                  'n_killing_spree': int,
+                                  'max_killing_spree': int,
 
                                   'kills_by_player': {
                                                       player1_name: int,

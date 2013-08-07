@@ -11,6 +11,7 @@ from render import HTMLRender, PlainTextRender
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 OPPOSITE_TEAM = {'5': 'Blue', '14': 'Red'}
 START_DELAY_TIME = timedelta(seconds=15)
+N_KILL_SPREE = 3
 HEADER_NAMES = {
             # Players Stats Table
                 'name': 'name',
@@ -42,6 +43,8 @@ HEADER_NAMES = {
                 'last_team': 'last team',
 
                 'pweapon': 'preffered weapon',
+                'max_killing_spree': 'longest killing spree',
+                'n_killing_spree': '# of killing spree',
                 'survival_index': 'survival index',
                 'cap_index': 'capture success index (%)',
                 'nemesis': 'nemesis',
@@ -56,11 +59,11 @@ HEADER_NAMES = {
                 'score': 'score',
                 'last_players': 'players',
                 'captures': 'captures log',
-
                 }
 
 
-NUMERIC_STATS = ['score', 'frags', 'tk', 'fc_kills', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi',
+NUMERIC_STATS = ['score', 'frags', 'tk', 'n_killing_spree',
+                 'fc_kills', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi',
                  'deaths', 'suicide', 'accident',
                  CAPTURE, RETURN, STEAL, DROPPED, PICKUP, 'cap_by_steal', 'cap_by_pickup',
                 ]
@@ -150,6 +153,7 @@ class NexuizLogParser:
         for logfile in logfile_list:
             line_number = 0
             capture_stack = dict()
+            killing_spree = dict()
 
             for line in open(logfile):
                 line_number += 1
@@ -171,6 +175,8 @@ class NexuizLogParser:
                         map_name = command[1][underscore_pos+1:]
 
                         players_name = dict()
+                        capture_stack = dict()
+                        killing_spree = dict()
                         self.in_game = True
                         self.games[self.count] = dict()
                         self.games[self.count]['map_data'] = {'map_name': map_name,
@@ -235,11 +241,14 @@ class NexuizLogParser:
                                                                             'kills_by_player': dict(),
                                                                             'deaths_by_player': dict(),
                                                                             'kills_by_weapon': dict(),
+
+                                                                            'killing_spree' : [],
                                                                             }
                             for stat in NUMERIC_STATS:
                                 self.games[self.count]['players'][player_name][stat] = 0
 
                             capture_stack[player_name] = []
+                            killing_spree[player_name] = 0
 
                     elif command_name == "team":
                         player_id , team_id = command[1:]
@@ -262,6 +271,10 @@ class NexuizLogParser:
 
                         self.games[self.count]['players'][killer]['kills_by_weapon'][killer_weapon] = self.games[self.count]['players'][killer]['kills_by_weapon'].get(killer_weapon, 0) + 1
 
+                        if killing_spree[killed] >= N_KILL_SPREE:
+                            self.games[self.count]['players'][killed]['killing_spree'].append(killing_spree[killed])
+                        killing_spree[killed] = 0
+
                         if text == "frag":         # kill other player
                             self.games[self.count]['players'][killer]['frags'] += 1
                             self.games[self.count]['players'][killer]['kills_by_player'][killed] = self.games[self.count]['players'][killer]['kills_by_player'].get(killed, 0) + 1
@@ -280,6 +293,8 @@ class NexuizLogParser:
                                 self.games[self.count]['players'][killer]['kills_wi'] += 1
                             if STRENGTH in killer_mod:
                                 self.games[self.count]['players'][killer]['kills_ws'] += 1
+
+                            killing_spree[killer] += 1
 
 
                         elif text == "suicide":    # kill himself, by weapon
@@ -367,6 +382,10 @@ class NexuizLogParser:
                         self.games[self.count]['map_data']['end_time'] = gametime
                         self.games[self.count]['map_data']['duration'] = str(gametime - self.games[self.count]['map_data']['start_time'])
 
+                        for pname, ks in killing_spree.items():
+                            if ks >= N_KILL_SPREE:
+                                self.games[self.count]['players'][pname]['killing_spree'].append(ks)
+
                     elif command_name == "gameover":
                         # This command marks the end of the game
                         self.count += 1
@@ -418,6 +437,9 @@ class NexuizLogParser:
                 if player['last_team']:
                     self.games[i]['teams'][player['last_team']]['last_players'].append(pname)
 
+                self.games[i]['players'][pname]['n_killing_spree'] = len(self.games[i]['players'][pname]['killing_spree'])
+                self.games[i]['players'][pname]['max_killing_spree'] = max(self.games[i]['players'][pname]['killing_spree'] or [0])
+
             for tname, team in game['teams'].items():
                 self.games[i]['teams'][tname]['last_players'] = ", ".join(self.games[i]['teams'][tname]['last_players'])
 
@@ -453,6 +475,9 @@ class NexuizLogParser:
                 self.total[pname]['nemesis'] = self.get_nemesis(self.total[pname])
                 self.total[pname]['rag_doll'] = self.get_rag_doll(self.total[pname])
 
+                self.total[pname]['max_killing_spree'] = max(self.total[pname].get('max_killing_spree', 0), player['max_killing_spree'])
+                self.total[pname]['max_killing_spree_sum'] = self.total[pname].get('max_killing_spree_sum', 0) + player['max_killing_spree']
+
     def _compute_average(self):
         stats_by_something = STATS_BY_PLAYER + STATS_BY_WEAPON
 
@@ -473,6 +498,8 @@ class NexuizLogParser:
 
             for stat, stat_func in self.special_stats.items():
                 self.average[pname][stat] = stat_func(self.average[pname])
+
+            self.average[pname]['max_killing_spree'] = av(player['max_killing_spree_sum'], num)
 
 
     def _parse_weapon(self, weapon, killer='', killed=''):
