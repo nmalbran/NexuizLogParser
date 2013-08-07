@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from optparse import OptionParser
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
+from ctf_strs import RETURNED, CAPTURE, RETURN, STEAL, DROPPED, PICKUP
 from render import HTMLRender, PlainTextRender
 
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
@@ -30,6 +31,8 @@ HEADER_NAMES = {
                 'pickup': 'pickups',
                 'return': 'return',
                 'dropped': 'dropped',
+                'cap_by_steal': 'caps by steal',
+                'cap_by_pickup': 'caps by pickup',
 
                 'score': 'score',
                 'games_played': 'games played',
@@ -58,7 +61,7 @@ HEADER_NAMES = {
 
 NUMERIC_STATS = ['score', 'frags', 'tk', 'fc_kills', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi',
                  'deaths', 'suicide', 'accident',
-                 'capture', 'return', 'steal', 'dropped', 'pickup',
+                 CAPTURE, RETURN, STEAL, DROPPED, PICKUP, 'cap_by_steal', 'cap_by_pickup',
                 ]
 
 STATS_BY_PLAYER = ['kills_by_player', 'deaths_by_player']
@@ -146,6 +149,8 @@ class NexuizLogParser:
         players_name = dict()
         for logfile in logfile_list:
             line_number = 0
+            capture_stack = dict()
+
             for line in open(logfile):
                 line_number += 1
                 self.logline = "%s:%d :" % (logfile, line_number)
@@ -234,6 +239,8 @@ class NexuizLogParser:
                             for stat in NUMERIC_STATS:
                                 self.games[self.count]['players'][player_name][stat] = 0
 
+                            capture_stack[player_name] = []
+
                     elif command_name == "team":
                         player_id , team_id = command[1:]
                         change_time = gametime - self.games[self.count]['map_data']['start_time']
@@ -295,19 +302,29 @@ class NexuizLogParser:
                         #  pickup   --> flag taken by a player (flag in the field)
                         subcommand = command[1]
                         team_id = command[2]
-                        if subcommand == "returned":
+                        if subcommand == RETURNED:
                             pass
-                        elif (subcommand == "capture" or
-                             subcommand == "return"  or
-                             subcommand == "steal"   or
-                             subcommand == "dropped" or
-                             subcommand == "pickup"):
+                        elif subcommand in [CAPTURE, RETURN, STEAL, DROPPED, PICKUP]:
                             player_id = command[3]
-                            self.games[self.count]['players'][players_name[player_id]][subcommand] += 1
+                            player_name = players_name[player_id]
 
-                            if subcommand == "capture":
+                            self.games[self.count]['players'][player_name][subcommand] += 1
+
+                            if subcommand in [STEAL, DROPPED, PICKUP]:
+                                capture_stack[player_name].append(subcommand)
+
+                            if subcommand == CAPTURE:
                                 capture_time = gametime - self.games[self.count]['map_data']['start_time']
-                                self.games[self.count]['teams'][OPPOSITE_TEAM[team_id]]['captures_log'].append((capture_time, players_name[player_id]))
+                                self.games[self.count]['teams'][OPPOSITE_TEAM[team_id]]['captures_log'].append((capture_time, player_name))
+
+                                type_of_capture = capture_stack[player_name][-1]
+                                if type_of_capture == STEAL:
+                                    self.games[self.count]['players'][player_name]['cap_by_steal'] += 1
+                                elif type_of_capture == PICKUP:
+                                    self.games[self.count]['players'][player_name]['cap_by_pickup'] += 1
+
+                                capture_stack[player_name] = []
+
                         else:
                             self.info.append('%s ctf subcommand not recognized:' % self.logline)
                             self.info.append(command)
@@ -493,7 +510,7 @@ class NexuizLogParser:
         return round((player['frags'] * 1.0) / (player['deaths'] or 1), 2)
 
     def get_cap_index(self, player):
-        return round((player['capture'] * 100.0) / ((player['steal'] + player['pickup']) or 1), 1)
+        return round((player['cap_by_steal'] * 100.0) / (player['steal'] or 1), 1)
 
     def get_nemesis(self, player):
         ordered_nemesis = sorted(player['deaths_by_player'].items(), key=lambda x:x[1], reverse=True)
