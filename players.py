@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 KNOWN_PLAYER_NICKS ={
-##########
-# HUMANS #
-##########
+
 'Alfonso':   ['akm'],
 'Allan':     ['The_Cleaner',
               '-= Mr. ]v[urphy =-',
@@ -48,26 +46,4 @@ KNOWN_PLAYER_NICKS ={
 'Cristian': ['Cchavez',],
 'Unknown':   [''],
 
-########
-# BOTS #
-########
-'[BOT]Airhead':      ['[BOT]Airhead'],
-'[BOT]Death':        ['[BOT]Death'],
-'[BOT]Delirium':     ['[BOT]Delirium'],
-'[BOT]Discovery':    ['[BOT]Discovery'],
-'[BOT]Dominator':    ['[BOT]Dominator'],
-'[BOT]Eureka':       ['[BOT]Eureka'],
-'[BOT]Gator':        ['[BOT]Gator'],
-'[BOT]Hellfire':     ['[BOT]Hellfire'],
-'[BOT]Lion':         ['[BOT]Lion'],
-'[BOT]Mystery':      ['[BOT]Mystery'],
-'[BOT]Necrotic':     ['[BOT]Necrotic'],
-'[BOT]Pegasus':      ['[BOT]Pegasus'],
-'[BOT]Resurrection': ['[BOT]Resurrection'],
-'[BOT]Scorcher':     ['[BOT]Scorcher'],
-'[BOT]Sensible':     ['[BOT]Sensible'],
-'[BOT]Shadow':       ['[BOT]Shadow'],
-'[BOT]Shadow':       ['[BOT]Shadow'],
-'[BOT]Thunderstorm': ['[BOT]Thunderstorm'],
-'[BOT]Toxic':        ['[BOT]Toxic']
 }

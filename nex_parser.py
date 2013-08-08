@@ -7,11 +7,13 @@ from optparse import OptionParser
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
 from ctf_strs import RETURNED, CAPTURE, RETURN, STEAL, DROPPED, PICKUP
 from render import HTMLRender, PlainTextRender
+from player_maps import KnownPlayerMapAdmin, EmptyPlayerMapAdmin
 
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 OPPOSITE_TEAM = {'5': 'Blue', '14': 'Red'}
 START_DELAY_TIME = timedelta(seconds=15)
 N_KILL_SPREE = 3
+DEFAULT_COLUMN_WIDTH = 10
 HEADER_NAMES = {
             # Players Stats Table
                 'name': 'name',
@@ -71,45 +73,22 @@ STATS_BY_PLAYER = ['kills_by_player', 'deaths_by_player']
 STATS_BY_WEAPON = ['kills_by_weapon', ]
 
 
-
-
-class KnownPlayerMapAdmin:
-
-    def __init__(self, known_player_nicks):
-        self.known_player_nicks = known_player_nicks
-        self.info = []
-        self.all_nicks = set()
-
-    def get_name_from_nick(self, nick):
-        for name in self.known_player_nicks:
-            if nick in self.known_player_nicks[name]:
-                return name
-
-        if nick not in self.all_nicks:
-            self.all_nicks.add(nick)
-            self.info.append("Nick not recognized: '%s': ['%s']" % (nick, repr(nick)))
-        return 'UNKNOWN'
-
-    def get_map(self):
-        return self.known_player_nicks
-
-    def get_info(self):
-        return self.info
-
-
-
 class NexuizLogParser:
 
-    def __init__(self, known_player_nicks, teams=TEAM_COLOR, average_precision=2, min_players_per_game=3):
+    def __init__(self, known_player_nicks=dict(), teams=TEAM_COLOR, average_precision=2, min_players_per_game=3):
         self.reset()
-        self.player_map = KnownPlayerMapAdmin(known_player_nicks)
+        if known_player_nicks:
+            self.player_map = KnownPlayerMapAdmin(known_player_nicks)
+        else:
+            self.player_map = EmptyPlayerMapAdmin()
+
         self.teams = teams
         self.average_precision = average_precision
         self.min_players_per_game = min_players_per_game
 
         self.longest_name_length = {
-            True: max([len(p) for p in known_player_nicks.keys()]), # display_bot = True
-            False: max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)]), # display_bot = False
+            True: max([len(p) for p in known_player_nicks.keys()] or [DEFAULT_COLUMN_WIDTH]), # display_bot = True
+            False: max([len(p) for p in known_player_nicks.keys() if not self.is_bot(p)] or [DEFAULT_COLUMN_WIDTH]), # display_bot = False
         }
 
         self.special_stats = {
@@ -268,7 +247,7 @@ class NexuizLogParser:
 
                     elif command_name == "team":
                         player_id , team_id = command[1:]
-                        change_time = gametime - self.games[self.count]['map_data']['start_time']
+                        change_time = gametime + START_DELAY_TIME - self.games[self.count]['map_data']['start_time']
                         if team_id not in self.teams:
                             continue
                         self.games[self.count]['players'][players_name[player_id]]['team'].append("%s (%s)" % (self.teams[team_id], change_time))
