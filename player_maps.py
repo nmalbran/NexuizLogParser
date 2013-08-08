@@ -69,11 +69,6 @@ class EmptyPlayerMapAdmin(PlayerMapAdmin):
         super(EmptyPlayerMapAdmin, self).__init__()
         self.n = 0
 
-    def _get_new_name(self):
-        name = 'player_%d' % self.n
-        self.n += 1
-        return name
-
     def get_name_from_nick(self, nick):
         name = super(EmptyPlayerMapAdmin, self).get_name_from_nick(nick)
         if name:
@@ -81,8 +76,7 @@ class EmptyPlayerMapAdmin(PlayerMapAdmin):
 
         if nick not in self.all_nicks:
             self.all_nicks.add(nick)
-            name = self._get_new_name()
-            self.known_player_nicks[name] = [nick]
-            return name
+            self.known_player_nicks[nick] = [nick]
+            return nick
 
         return "UNKNOWN"
