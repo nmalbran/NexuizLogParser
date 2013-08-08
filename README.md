@@ -18,10 +18,12 @@ Based in Trablas' parser.
       -o OUTPUT, --output=OUTPUT
                             File to output result.
       -b, --bot             Display Bot's results
+      -p PLAYERS, --players=PLAYERS
+                            Package.variable containing the players/nicks map.
+                            Default: players.KNOWN_PLAYER_NICKS
       --nototal             Don't display totals
       --noparcial           Don't display individual game results
       -q, --quiet           Don't display parser error
-
 
 
 #### As module
@@ -40,6 +42,16 @@ The same person can have different nicknames in one log file. To solve that, the
             'NamePlayer1': ['nick1', 'nick2', 'nick3'],
             'NamePlayer2': ['John', 'foo', 'bar'],
         }
+
+`KNOWN_PLAYER_NICKS` can be an empty dict and players name will be auto generated.
+
+The option `-p, --players` is used to point where to find the dict:
+
+- `-p foo.bar` => `from foo import bar as KNOWN_PLAYER_NICKS`
+- `-p foo` => `from foo import KNOWN_PLAYER_NICKS`
+- no `-p` => `from players import KNOWN_PLAYER_NICKS`
+- if the above fails => `KNOWN_PLAYER_NICKS = dict()`
+
 
 ### Result format
 The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.get_total()` functions follow this format:
