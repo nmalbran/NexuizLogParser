@@ -71,11 +71,38 @@ STATS_BY_PLAYER = ['kills_by_player', 'deaths_by_player']
 STATS_BY_WEAPON = ['kills_by_weapon', ]
 
 
+
+
+class KnownPlayerMapAdmin:
+
+    def __init__(self, known_player_nicks):
+        self.known_player_nicks = known_player_nicks
+        self.info = []
+        self.all_nicks = set()
+
+    def get_name_from_nick(self, nick):
+        for name in self.known_player_nicks:
+            if nick in self.known_player_nicks[name]:
+                return name
+
+        if nick not in self.all_nicks:
+            self.all_nicks.add(nick)
+            self.info.append("Nick not recognized: '%s': ['%s']" % (nick, repr(nick)))
+        return 'UNKNOWN'
+
+    def get_map(self):
+        return self.known_player_nicks
+
+    def get_info(self):
+        return self.info
+
+
+
 class NexuizLogParser:
 
     def __init__(self, known_player_nicks, teams=TEAM_COLOR, average_precision=2, min_players_per_game=3):
         self.reset()
-        self.known_player_nicks = known_player_nicks
+        self.player_map = KnownPlayerMapAdmin(known_player_nicks)
         self.teams = teams
         self.average_precision = average_precision
         self.min_players_per_game = min_players_per_game
@@ -101,7 +128,6 @@ class NexuizLogParser:
         self.in_game = False
         self.count = 0
         self.games = dict()
-        self.player_nicks = set()
         self.info = []
         self.total = dict()
         self.average = dict()
@@ -111,16 +137,6 @@ class NexuizLogParser:
 
     def is_bot(self, name):
         return name.startswith('[BOT]')
-
-
-    def _get_name_from_nick(self, nick):
-        for name in self.known_player_nicks:
-            if nick in self.known_player_nicks[name]:
-                return name
-        if nick not in self.player_nicks:
-            self.player_nicks.add(nick)
-            self.info.append("%s Nick not recognized: '%s': ['%s']" % (self.logline, nick, repr(nick)))
-        return 'UNKNOWN'
 
 
     def get_results(self):
@@ -220,7 +236,7 @@ class NexuizLogParser:
                         # xx: ??
                         player_id, xx, ip_from, nick = command[1:]
                         #if nick[0:5] != "[BOT]":
-                        player_name = self._get_name_from_nick(nick)
+                        player_name = self.player_map.get_name_from_nick(nick) # self._get_name_from_nick(nick)
 
                         if 'players' not in self.games[self.count]:
                             self.games[self.count]['players'] = dict()
@@ -416,6 +432,7 @@ class NexuizLogParser:
         self._compute_extra_stats()
         self._compute_total()
         self._compute_average()
+        self.info += self.player_map.get_info()
 
 
     def _clean_games(self):
