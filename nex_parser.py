@@ -115,7 +115,7 @@ class NexuizLogParser:
 
 
     def is_bot(self, name):
-        return name.startswith('[BOT]')
+        return self.player_map.is_bot(name)
 
 
     def get_results(self):
