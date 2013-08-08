@@ -647,20 +647,44 @@ class NexuizLogParser:
         return render.base(content)
 
 
-if __name__ == '__main__':
-    from players import KNOWN_PLAYER_NICKS
 
+def get_known_player_nicks(player_package=None):
+    module = 'players'
+    var = 'KNOWN_PLAYER_NICKS'
+
+    if player_package:
+        dot = player_package.rfind('.')
+        if dot > 0:
+            module = player_package[:dot]
+            var = player_package[dot+1:] or var
+        else:
+            module = player_package
+
+    from importlib import import_module
+    try:
+        module = import_module(module)
+        known_player_nicks = module.__getattribute__(var)
+
+    except (ImportError, AttributeError) as e:
+        known_player_nicks = dict()
+
+    return known_player_nicks
+
+
+def main():
     parser = OptionParser(usage='usage: %prog [options] logfile1 [logfile2 logfile3 ...]')
     parser.add_option("-t", '--type', action="store", help="Type of the output result (html, txt)", default='html', choices=['html', 'txt'])
     parser.add_option("-o", '--output', action="store", help="File to output result.", default='')
     parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results", default=False)
+    parser.add_option('-p', "--players", action="store", help="Package.variable containing the players/nicks map. Default: players.KNOWN_PLAYER_NICKS", default=None)
+
     parser.add_option("--nototal", action="store_false", dest='total', help="Don't display totals", default=True)
     parser.add_option("--noparcial", action="store_false", dest='parcial', help="Don't display individual game results", default=True)
     parser.add_option("-q", "--quiet", action="store_false", dest='info', help="Don't display parser error", default=True)
 
     (options, args) = parser.parse_args()
 
-    nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
+    nlp = NexuizLogParser(get_known_player_nicks(options.players))
     nlp.parse_log(args)
 
     if not options.output:
@@ -676,3 +700,7 @@ if __name__ == '__main__':
 
     if options.info:
         nlp.display_parser_info()
+
+
+if __name__ == '__main__':
+    main()
