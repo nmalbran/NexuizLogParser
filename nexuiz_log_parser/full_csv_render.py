@@ -1,13 +1,13 @@
 
 import sys
-from players import KNOWN_PLAYER_NICKS
+from players import PLAYERS
 from weapons import WEAPONS
 from nex_parser import NexuizLogParser
 
 class FullCSVRender():
 
     def __init__(self, players):
-        self.all_players = KNOWN_PLAYER_NICKS.keys()
+        self.all_players = PLAYERS.keys()
         self.all_weapons = WEAPONS.values()
         self.players = players
 
@@ -60,7 +60,7 @@ class FullCSVRender():
 
 
 def main():
-    nlp = NexuizLogParser(KNOWN_PLAYER_NICKS, average_precision=4)
+    nlp = NexuizLogParser(PLAYERS, average_precision=4)
     nlp.parse_logs(sys.argv[1:])
 
     average = nlp.get_average()

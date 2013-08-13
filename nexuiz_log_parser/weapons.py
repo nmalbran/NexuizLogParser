@@ -22,9 +22,11 @@ WEAPONS = {
 STRENGTH = 'S'
 FLAG     = 'F'
 SHIELD   = 'I'
+TEXT     = 'T'
 
 WEAPON_MOD = {
     STRENGTH: 'Strength',
     FLAG: 'Flag',
     SHIELD: 'Shield',
+    TEXT: 'Text',
 }

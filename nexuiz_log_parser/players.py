@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-KNOWN_PLAYER_NICKS ={
+PLAYERS ={
 
 'Alfonso':   ['akm'],
 'Allan':     ['The_Cleaner',
@@ -41,6 +41,7 @@ KNOWN_PLAYER_NICKS ={
               'riCOOLdator\x07-\x07Long Dong Silver',
               'riCOOLdator\x07-\x07yo\x03SI\x03tengo\x03lentes\x03\x17',
               'RAKESH-dator - GIMME YOUR PASSPORTS FUCKING SLAVES!',
+              'ricardator - de proporzionez cataztroficaz',
               'ricardator'],
 'Francisco': ['[FS]Slaughter',],
 'Cristian': ['Cchavez',],

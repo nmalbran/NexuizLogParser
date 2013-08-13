@@ -24,7 +24,7 @@ Based in Trablas' parser.
       -b, --bot             Display Bot's results
       -p PLAYERS, --players=PLAYERS
                             Package.variable containing the players/nicks map.
-                            Default: players.KNOWN_PLAYER_NICKS
+                            Default: players.PLAYERS
       --nototal             Don't display totals
       --noparcial           Don't display individual game results
       -q, --quiet           Don't display parser error
@@ -33,28 +33,28 @@ Based in Trablas' parser.
 #### As module
     from nexuiz_log_parser import NexuizLogParser
 
-    nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
+    nlp = NexuizLogParser(PLAYERS)
     nlp.parse_logs(['server.log'])
 
     print nlp.get_results()
 
-### `KNOWN_PLAYER_NICKS` format
+### `PLAYERS` format
 The same person can have different nicknames in one log file. To solve that, the parser receive the following dictionary with nicknames:
 
-    KNOWN_PLAYER_NICKS =
+    PLAYERS =
         {
             'NamePlayer1': ['nick1', 'nick2', 'nick3'],
             'NamePlayer2': ['John', 'foo', 'bar'],
         }
 
-`KNOWN_PLAYER_NICKS` can be an empty dict and players name will be auto generated.
+`PLAYERS` can be an empty dict and players name will be auto generated.
 
 The option `-p, --players` is used to point where to find the dict:
 
-- `-p foo.bar` => `from foo import bar as KNOWN_PLAYER_NICKS`
-- `-p foo` => `from foo import KNOWN_PLAYER_NICKS`
-- no `-p` => `from players import KNOWN_PLAYER_NICKS`
-- if the above fails => `KNOWN_PLAYER_NICKS = dict()`
+- `-p foo.bar` => `from foo import bar as PLAYERS`
+- `-p foo` => `from foo import PLAYERS`
+- no `-p` => `from players import PLAYERS`
+- if the above fails => `PLAYERS = dict()`
 
 
 ### Result format
@@ -93,6 +93,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'fc_kills': int,
                                                   'sc_kills': int,
                                                   'ic_kills': int,
+                                                  'tc_kills': int,
 
                                                   'kills_wf': int,
                                                   'kills_ws': int,
@@ -148,6 +149,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'fc_kills': int,
                                   'sc_kills': int,
                                   'ic_kills': int,
+                                  'tc_kills': int,
 
                                   'kills_wf': int,
                                   'kills_ws': int,
@@ -193,7 +195,7 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
 *Notes*:
 
 - `player.id` and `team.id` are the id given by Nexuiz, in string format.
-- `players.nick` is the nickname used in that game, while `players.name` is the name mapped by `KNOWN_PLAYER_NICKS`.
+- `players.nick` is the nickname used in that game, while `players.name` is the name mapped by `PLAYERS`.
 - The time in `players.team` is when the player joined the team.
 - The top level numbers are the game's number, in order of appearance in the log.
 - `player.last_team` is the last team which the player joined.

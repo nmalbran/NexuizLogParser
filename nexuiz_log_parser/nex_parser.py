@@ -4,7 +4,7 @@ import os
 import time
 from datetime import datetime, timedelta
 from optparse import OptionParser
-from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
+from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD, TEXT
 from ctf_strs import RETURNED, CAPTURE, RETURN, STEAL, DROPPED, PICKUP
 from render import HTMLRender, PlainTextRender
 from player_maps import AutoCompletePlayerMapAdmin
@@ -26,6 +26,7 @@ HEADER_NAMES = {
                 'fc_kills': 'fc kills',
                 'sc_kills': 'strength kills',
                 'ic_kills': 'shield kills',
+                'tc_kills': 'texting kills',
                 'kills_wf': 'kills w/ flag',
                 'kills_ws': 'kills w/ strength',
                 'kills_wi': 'kills w/ shield',
@@ -65,7 +66,7 @@ HEADER_NAMES = {
 
 
 NUMERIC_STATS = ['score', 'frags', 'tk', 'n_killing_spree',
-                 'fc_kills', 'sc_kills', 'ic_kills', 'kills_wf', 'kills_ws', 'kills_wi',
+                 'fc_kills', 'sc_kills', 'ic_kills', 'tc_kills', 'kills_wf', 'kills_ws', 'kills_wi',
                  'deaths', 'suicide', 'accident',
                  CAPTURE, RETURN, STEAL, DROPPED, PICKUP, 'cap_by_steal', 'cap_by_pickup',
                 ]
@@ -277,6 +278,8 @@ class NexuizLogParser:
                                 self.games[self.count]['players'][killer]['ic_kills'] += 1
                             if STRENGTH in killed_mod:
                                 self.games[self.count]['players'][killer]['sc_kills'] += 1
+                            if TEXT in killed_mod:
+                                self.games[self.count]['players'][killer]['tc_kills'] += 1
 
                             if FLAG in killer_mod:
                                 self.games[self.count]['players'][killer]['kills_wf'] += 1
@@ -646,7 +649,7 @@ class NexuizLogParser:
 
 def get_known_player_nicks(player_package=None):
     module = 'players'
-    var = 'KNOWN_PLAYER_NICKS'
+    var = 'PLAYERS'
 
     if player_package:
         dot = player_package.rfind('.')
@@ -672,7 +675,7 @@ def main():
     parser.add_option("-t", '--type', action="store", help="Type of the output result (html, txt)", default='html', choices=['html', 'txt'])
     parser.add_option("-o", '--output', action="store", help="File to output result.", default='')
     parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results", default=False)
-    parser.add_option('-p', "--players", action="store", help="Package.variable containing the players/nicks map. Default: players.KNOWN_PLAYER_NICKS", default=None)
+    parser.add_option('-p', "--players", action="store", help="Package.variable containing the players/nicks map. Default: players.PLAYERS", default=None)
 
     parser.add_option("--nototal", action="store_false", dest='total', help="Don't display totals", default=True)
     parser.add_option("--noparcial", action="store_false", dest='parcial', help="Don't display individual game results", default=True)
