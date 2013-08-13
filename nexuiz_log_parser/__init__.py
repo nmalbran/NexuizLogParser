@@ -1,1 +1,1 @@
-from nex_parser import NexuizLogParser
+from nex_parser import NexuizLogParser, get_known_player_nicks
