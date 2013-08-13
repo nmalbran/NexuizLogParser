@@ -59,8 +59,7 @@ class FullCSVRender():
 
 
 
-if __name__ == '__main__':
-
+def main():
     nlp = NexuizLogParser(KNOWN_PLAYER_NICKS, average_precision=4)
     nlp.parse_log(sys.argv[1:])
 
@@ -69,3 +68,5 @@ if __name__ == '__main__':
 
     print fcr.output()
 
+if __name__ == '__main__':
+    main()
