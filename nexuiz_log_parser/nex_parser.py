@@ -135,7 +135,7 @@ class NexuizLogParser:
         return self.average
 
 
-    def parse_log(self, logfile_list):
+    def parse_logs(self, logfile_list):
         """
             Parse the log in `logfile`.
         """
@@ -681,7 +681,7 @@ def main():
     (options, args) = parser.parse_args()
 
     nlp = NexuizLogParser(get_known_player_nicks(options.players))
-    nlp.parse_log(args)
+    nlp.parse_logs(args)
 
     if not options.output:
         filename = '%s-stats.%s' % (time.strftime("%Y%m%d"), options.type)

@@ -4,14 +4,18 @@ Nexuiz Log Parser
 Log parser for Nexuiz game.
 Based in Trablas' parser.
 
+### Installation
+
+    python setup.py install
+
 ### Usage example
 
 #### CLI
-    python nex_parser.py -t txt server.log
-    python nex_parser.py -o stats.html server.log
-    python nex_parser.py *.log -o all.html
+    nexlogparser server.log
+    nexlogparser -t txt server.log
+    nexlogparser *.log -o all.html
 
-    Usage: nex_parser.py [options] logfile1 [logfile2 logfile3 ...]
+    Usage: nexlogparser [options] logfile1 [logfile2 logfile3 ...]
     Options:
       -h, --help            show this help message and exit
       -t TYPE, --type=TYPE  Type of the output result (html, txt)
@@ -27,10 +31,10 @@ Based in Trablas' parser.
 
 
 #### As module
-    from nex_parser import NexuizLogParser
+    from nexuiz_log_parser import NexuizLogParser
 
     nlp = NexuizLogParser(KNOWN_PLAYER_NICKS)
-    nlp.parse_log('server.log')
+    nlp.parse_logs(['server.log'])
 
     print nlp.get_results()
 
