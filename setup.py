@@ -8,23 +8,26 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name = "nexuiz-log-parser",
-    version = "0.1",
-    packages = find_packages(exclude=['players.py']),
+    name = "NexuizLogParser",
+    version = "1.0",
     author = "Nicolas Malbran",
     author_email = "nmalbran@gmail.com",
+
     description = "Log parser for Nexuiz game.",
     long_description=read('README.md'),
-
     keywords = "nexuiz log parser game",
-
     url = 'https://github.com/nmalbran/nexuiz-log-parser',
+    download_url = 'https://github.com/nmalbran/nexuiz-log-parser',
+
+    packages = find_packages(),
+    package_data={'nexuiz_log_parser': ['html_templates/*']},
 
     zip_safe = False,
 
     entry_points = {
         'console_scripts': [
-            'nexuizlogparser = nex_parser:main',
+            'nexlogparser = nexuiz_log_parser.nex_parser:main',
+            'nexcsvfullparse = nexuiz_log_parser.full_csv_render:main',
         ],
     },
 )

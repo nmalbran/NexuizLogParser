@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
 
-TEMPLATE_FOLDER = 'html_templates/'
+TEMPLATE_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'html_templates')
 SEP = "=" * 80 + "\n"
 STR_GAME_ROW = ["%(name)", "s  %(score)5s  %(frags)5s  %(fc_kills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s  %(teams)s\n"]
 STR_TOTAL_ROW = ["%(name)", "s  %(score)5s  %(frags)5s  %(fc_kills)9s  %(tk)10s | %(deaths)6s  %(suicide)8s  %(accident)9s | %(steal)6s  %(capture)4s  %(pickup)7s | %(pweapon)-28s\n"]
@@ -50,17 +51,17 @@ class HTMLRender(BaseRender):
     def __init__(self, header_names, **kwargs):
         capitalized_names = dict([(i, n.capitalize()) for i,n in header_names.items()])
         super(HTMLRender, self).__init__(capitalized_names, **kwargs)
-        self.base_t = open(TEMPLATE_FOLDER + 'base.html').read()
-        self.game_t = open(TEMPLATE_FOLDER + 'game.html').read()
-        self.player_row_t = open(TEMPLATE_FOLDER + 'player_row.html').read()
-        self.team_row_t = open(TEMPLATE_FOLDER + 'team_row.html').read()
-        self.total_row_t = open(TEMPLATE_FOLDER + 'total_row.html').read()
-        self.total_t = open(TEMPLATE_FOLDER + 'total.html').read()
+        self.base_t = open(os.path.join(TEMPLATE_FOLDER, 'base.html')).read()
+        self.game_t = open(os.path.join(TEMPLATE_FOLDER, 'game.html')).read()
+        self.player_row_t = open(os.path.join(TEMPLATE_FOLDER, 'player_row.html')).read()
+        self.team_row_t = open(os.path.join(TEMPLATE_FOLDER, 'team_row.html')).read()
+        self.total_row_t = open(os.path.join(TEMPLATE_FOLDER, 'total_row.html')).read()
+        self.total_t = open(os.path.join(TEMPLATE_FOLDER, 'total.html')).read()
         self.header_css = 'header'
 
     def base(self, base_data):
-        css = open(TEMPLATE_FOLDER + 'style.css').read()
-        js = open(TEMPLATE_FOLDER + 'sorttable.js').read()
+        css = open(os.path.join(TEMPLATE_FOLDER, 'style.css')).read()
+        js = open(os.path.join(TEMPLATE_FOLDER, 'sorttable.js')).read()
 
         return self.base_t % dict(base_data, css=css, js=js)
 
