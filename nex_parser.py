@@ -7,7 +7,7 @@ from optparse import OptionParser
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD
 from ctf_strs import RETURNED, CAPTURE, RETURN, STEAL, DROPPED, PICKUP
 from render import HTMLRender, PlainTextRender
-from player_maps import KnownPlayerMapAdmin, EmptyPlayerMapAdmin
+from player_maps import AutoCompletePlayerMapAdmin
 
 TEAM_COLOR = {'5': 'Red', '14': 'Blue'}
 OPPOSITE_TEAM = {'5': 'Blue', '14': 'Red'}
@@ -77,11 +77,7 @@ class NexuizLogParser:
 
     def __init__(self, known_player_nicks=dict(), teams=TEAM_COLOR, average_precision=2, min_players_per_game=3):
         self.reset()
-        if known_player_nicks:
-            self.player_map = KnownPlayerMapAdmin(known_player_nicks)
-        else:
-            self.player_map = EmptyPlayerMapAdmin()
-
+        self.player_map = AutoCompletePlayerMapAdmin(known_player_nicks)
         self.teams = teams
         self.average_precision = average_precision
         self.min_players_per_game = min_players_per_game

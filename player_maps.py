@@ -65,10 +65,6 @@ class KnownPlayerMapAdmin(PlayerMapAdmin):
 
 class EmptyPlayerMapAdmin(PlayerMapAdmin):
 
-    def __init__(self):
-        super(EmptyPlayerMapAdmin, self).__init__()
-        self.n = 0
-
     def get_name_from_nick(self, nick):
         name = super(EmptyPlayerMapAdmin, self).get_name_from_nick(nick)
         if name:
@@ -80,3 +76,23 @@ class EmptyPlayerMapAdmin(PlayerMapAdmin):
             return nick
 
         return "UNKNOWN"
+
+
+class AutoCompletePlayerMapAdmin(PlayerMapAdmin):
+
+    def __init__(self, extra_nicks):
+        super(AutoCompletePlayerMapAdmin, self).__init__()
+        self.known_player_nicks = dict(self.known_player_nicks, **extra_nicks)
+
+    def get_name_from_nick(self, nick):
+        name = super(AutoCompletePlayerMapAdmin, self).get_name_from_nick(nick)
+        if name:
+            return name
+
+        if nick not in self.all_nicks:
+            self.all_nicks.add(nick)
+            self.info.append("Nick not recognized: '%s': ['%s']" % (nick, repr(nick)))
+            self.known_player_nicks[nick] = [nick]
+            return nick
+
+        return 'UNKNOWN'
