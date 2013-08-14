@@ -4,6 +4,8 @@ Nexuiz Log Parser
 Log parser for Nexuiz game.
 Based in Trablas' parser.
 
+You can try the demo here: [Demo](http://nexuiz-log-parser.herokuapp.com)
+
 ### Installation
 
     python setup.py install
