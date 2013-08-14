@@ -12,6 +12,8 @@ You can try the demo here: [Demo](http://nexuiz-log-parser.herokuapp.com)
 
 ### Usage example
 
+In order to work, the server config file must have: `sv_eventlog 1`.
+
 #### CLI
     nexlogparser server.log
     nexlogparser -t txt server.log
