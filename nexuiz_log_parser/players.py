@@ -32,6 +32,7 @@ PLAYERS ={
               '^x0A1SkyRyu^xB10\x95^7',
               '^x0A1\xd3ky\xd2yu^7',
               '^x0A1ÓkyÒyu^7',
+	      '\xc3\x93ky\xc3\x92yu',
               '\xd3ky\xd2yu'],
 'Pedro':     ['pedratan'],
 'Ricardo': ['riCOOLdator',
@@ -45,6 +46,7 @@ PLAYERS ={
               'ricardator'],
 'Francisco': ['[FS]Slaughter',],
 'Cristian': ['Cchavez',],
+'Almendra': ['Almendra',],
 'Unknown':   [''],
 
 }

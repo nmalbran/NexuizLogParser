@@ -674,6 +674,7 @@ def main():
     parser = OptionParser(usage='usage: %prog [options] logfile1 [logfile2 logfile3 ...]')
     parser.add_option("-t", '--type', action="store", help="Type of the output result (html, txt)", default='html', choices=['html', 'txt'])
     parser.add_option("-o", '--output', action="store", help="File to output result.", default='')
+    parser.add_option("-n", '--minplayers', action="store", type="int", help="Minimun number of players to consider a game.", default=3)
     parser.add_option('-b', "--bot", action="store_true", help="Display Bot's results", default=False)
     parser.add_option('-p', "--players", action="store", help="Package.variable containing the players/nicks map. Default: players.PLAYERS", default=None)
 
@@ -683,7 +684,7 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    nlp = NexuizLogParser(get_known_player_nicks(options.players))
+    nlp = NexuizLogParser(get_known_player_nicks(options.players), min_players_per_game=options.minplayers)
     nlp.parse_logs(args)
 
     if not options.output:
