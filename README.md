@@ -136,6 +136,9 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                                   'cap_index': float %,
                                                   'nemesis': str,
                                                   'rag_doll': str,
+
+                                                  'last': 1 or 0,
+                                                  'not_last' 1 - last,
                                      },
                                      player2_name: {...},
                          }
@@ -191,6 +194,9 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
                                   'nemesis': str,
                                   'rag_doll': str,
 
+                                  'last': int,
+                                  'not_last': int,
+
                                   'games_played': int,
                    },
                    player2_name: {...},
@@ -212,3 +218,6 @@ The results given by the `NexuizLogParser.get_results()` and `NexuizLogParser.ge
 - `cap_index`: `capture *100 / (steal + pickup)`%
 - `nemesis`: The name of the player who killed most times this player
 - `rag_doll`: The name of the player killed most time by this player
+- `last`/`not_last`:
+    - In result: If the player was last or not in this game.
+    - In total: The total number of `last`/`not_last`.

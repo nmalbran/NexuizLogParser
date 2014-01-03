@@ -23,6 +23,7 @@ PLAYERS ={
 'Jorge':     ['Jordude'],
 'Kurt':      ['Trablas'],
 'Marco':     ['\xcd\xc0rc0',
+              '?rc0',
               'ÍÀrc0'],
 'Nicolas':   ['SkyRyu',
               'Nmalbran',
@@ -32,6 +33,7 @@ PLAYERS ={
               '^x0A1SkyRyu^xB10\x95^7',
               '^x0A1\xd3ky\xd2yu^7',
               '^x0A1ÓkyÒyu^7',
+	      '\xc3\x93ky\xc3\x92yu',
               '\xd3ky\xd2yu'],
 'Pedro':     ['pedratan'],
 'Ricardo': ['riCOOLdator',
@@ -42,9 +44,11 @@ PLAYERS ={
               'riCOOLdator\x07-\x07yo\x03SI\x03tengo\x03lentes\x03\x17',
               'RAKESH-dator - GIMME YOUR PASSPORTS FUCKING SLAVES!',
               'ricardator - de proporzionez cataztroficaz',
+              'Pope\x01ricardator\x03THE\x1aSECOND\x1a:(',
               'ricardator'],
 'Francisco': ['[FS]Slaughter',],
 'Cristian': ['Cchavez',],
+'Almendra': ['Almendra',],
 'Unknown':   [''],
 
 }
