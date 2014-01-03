@@ -210,8 +210,11 @@ class NexuizLogParser:
                         # ip_from: IP address of the player
                         # nick: Nickname of the player
                         # xx: ??
-                        player_id, xx, ip_from, nick = command[1:]
-                        #if nick[0:5] != "[BOT]":
+                        player_id = command[1]
+                        xx = command[2]
+                        ip_from = command[3]
+                        nick = ":".join(command[4:])
+
                         player_name = self.player_map.get_name_from_nick(nick) # self._get_name_from_nick(nick)
 
                         if 'players' not in self.games[self.count]:

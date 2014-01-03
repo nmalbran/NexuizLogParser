@@ -43,6 +43,7 @@ PLAYERS ={
               'riCOOLdator\x07-\x07yo\x03SI\x03tengo\x03lentes\x03\x17',
               'RAKESH-dator - GIMME YOUR PASSPORTS FUCKING SLAVES!',
               'ricardator - de proporzionez cataztroficaz',
+              'Pope\x01ricardator\x03THE\x1aSECOND\x1a:(',
               'ricardator'],
 'Francisco': ['[FS]Slaughter',],
 'Cristian': ['Cchavez',],
