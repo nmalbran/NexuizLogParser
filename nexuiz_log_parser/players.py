@@ -23,6 +23,7 @@ PLAYERS ={
 'Jorge':     ['Jordude'],
 'Kurt':      ['Trablas'],
 'Marco':     ['\xcd\xc0rc0',
+              '?rc0',
               'ÍÀrc0'],
 'Nicolas':   ['SkyRyu',
               'Nmalbran',
