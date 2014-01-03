@@ -4,6 +4,8 @@ import os
 import time
 from datetime import datetime, timedelta
 from optparse import OptionParser
+from operator import itemgetter, attrgetter
+
 from weapons import WEAPONS, WEAPON_MOD, STRENGTH, FLAG, SHIELD, TEXT
 from ctf_strs import RETURNED, CAPTURE, RETURN, STEAL, DROPPED, PICKUP
 from render import HTMLRender, PlainTextRender
@@ -53,6 +55,8 @@ HEADER_NAMES = {
                 'cap_index': 'capture success index (%)',
                 'nemesis': 'nemesis',
                 'rag_doll': 'rag doll',
+                'last': 'last',
+                'not_last': 'not last',
 
             # Players vs Players Table
                 'killervskilled': 'killer',
@@ -70,6 +74,7 @@ NUMERIC_STATS = ['score', 'frags', 'tk', 'n_killing_spree',
                  'fc_kills', 'sc_kills', 'ic_kills', 'tc_kills', 'kills_wf', 'kills_ws', 'kills_wi',
                  'deaths', 'suicide', 'accident',
                  CAPTURE, RETURN, STEAL, DROPPED, PICKUP, 'cap_by_steal', 'cap_by_pickup',
+                 'last', 'not_last',
                 ]
 STATS_BY_PLAYER = ['kills_by_player', 'deaths_by_player']
 STATS_BY_WEAPON = ['kills_by_weapon', ]
@@ -95,6 +100,7 @@ class NexuizLogParser:
             'cap_index': self.get_cap_index,
             'nemesis': self.get_nemesis,
             'rag_doll': self.get_rag_doll,
+            'not_last': self.get_not_last,
         }
 
 
@@ -429,6 +435,9 @@ class NexuizLogParser:
 
     def _compute_extra_stats(self):
         for i, game in self.games.items():
+            last_player_name = self._get_last_player_name(game['players'])
+            self.games[i]['players'][last_player_name]['last'] = 1
+
             for pname, player in game['players'].items():
                 for stat, stat_func in self.special_stats.items():
                     self.games[i]['players'][pname][stat] = stat_func(player)
@@ -552,6 +561,12 @@ class NexuizLogParser:
         except IndexError as e:
             return ''
 
+    def get_not_last(self, player, all_games=False):
+        if all_games:
+            return len(self.games) - player['last']
+        else:
+            return 1 - player['last']
+
     def get_total_time_played(self):
         durations = [game['map_data']['duration'] for i, game in self.games.items()]
         return sum(durations, AVERAGE_TIME_TO_SELECT_A_MAP * len(self.games))
@@ -572,13 +587,26 @@ class NexuizLogParser:
     def _game_is_ctf(self, game):
         return 'teams' in game and game['map_data']['game_type'] == 'ctf'
 
-    def _filter_and_sort(self, players, display_bot=False):
+    def _filter_players_from_bots(self, players, display_bot=False):
         def valid(player):
             if self.is_bot(player['name']) and not display_bot:
                 return False
             return True
 
-        return sorted([p for p in players if valid(p)], key=lambda x: x['name'])
+        return [p for p in players.values() if valid(p)]
+
+
+    def _filter_players_and_sort_by_stat(self, players, display_bot=False, stat='name'):
+        filtered_players = self._filter_players_from_bots(players, display_bot)
+        return sorted(filtered_players, key=itemgetter(stat))
+
+
+    def _get_last_player_name(self, players):
+        filtered_players = self._filter_players_from_bots(players, display_bot=False)
+        filtered_players.sort(key=itemgetter('deaths'), reverse=True)
+        filtered_players.sort(key=itemgetter('score'))
+        return filtered_players[0]['name']
+
 
     def _output_players_scores(self, render, players, table='game'):
         header = {'total':render.total_table_header, 'game': render.game_table_header}
@@ -627,7 +655,7 @@ class NexuizLogParser:
 
         if display_parcial:
             for i, game in self._sorted_games():
-                players = self._filter_and_sort(game['players'].values(), display_bot)
+                players = self._filter_players_and_sort_by_stat(game['players'], display_bot)
                 game_data = game['map_data']
                 game_data['player_stats'] = self._output_players_scores(render, players, table='game')
                 game_data['player_vs_player'] = self._output_kills_by_player(render, players)
@@ -640,8 +668,8 @@ class NexuizLogParser:
                 content['games_tables'] += render.game(game_data)
 
         if display_total:
-            total_players = self._filter_and_sort(self.total.values(), display_bot)
-            average_players = self._filter_and_sort(self.average.values(), display_bot)
+            total_players = self._filter_players_and_sort_by_stat(self.total, display_bot)
+            average_players = self._filter_players_and_sort_by_stat(self.average, display_bot)
             total_data = {
                 'game_number': len(self.games),
                 'time_played': self.get_total_time_played(),
