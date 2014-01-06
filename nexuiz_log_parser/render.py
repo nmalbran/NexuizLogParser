@@ -76,7 +76,10 @@ class HTMLRender(BaseRender):
         return self.player_row_t % dict(self.header_names, css=self.header_css)
 
     def game_table_row(self, player):
-        css = "%s-t" % player['last_team'].lower()
+        if player['last_team']:
+            css = "%s-t" % player['last_team'].lower()
+        else:
+            css = ''
         return self.player_row_t % dict(player, css=css)
 
     def total_table_header(self):
