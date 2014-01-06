@@ -25,6 +25,8 @@ In order to work, the server config file must have: `sv_eventlog 1`.
       -t TYPE, --type=TYPE  Type of the output result (html, txt)
       -o OUTPUT, --output=OUTPUT
                             File to output result.
+      -n MINPLAYERS, --minplayers=MINPLAYERS
+                            Minimun number of players to consider a game.
       -b, --bot             Display Bot's results
       -p PLAYERS, --players=PLAYERS
                             Package.variable containing the players/nicks map.
