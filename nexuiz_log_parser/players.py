@@ -47,8 +47,14 @@ PLAYERS ={
               'Pope\x01ricardator\x03THE\x1aSECOND\x1a:(',
               'ricardator'],
 'Francisco': ['[FS]Slaughter',],
-'Cristian': ['Cchavez',],
-'Almendra': ['Almendra',],
+'Cristian':  ['Cchavez',],
+'Almendra':  ['Almendra',
+              '[InTerns]Almendra'],
+'Diego':     ['[InTerns] Baka'],
+'Juan Pablo': ['JPablo',
+               '[InTerns]JuanPablo'],
+'Ignacio':   ['[InTerns]Nacho'],
+'Isaias':    ['[InTerns]Demoxx'],
 'Unknown':   [''],
 
 }
