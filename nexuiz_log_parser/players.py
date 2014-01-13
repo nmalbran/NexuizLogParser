@@ -53,7 +53,8 @@ PLAYERS ={
 'Diego':     ['[InTerns] Baka'],
 'Juan Pablo': ['JPablo',
                '[InTerns]JuanPablo'],
-'Ignacio':   ['[InTerns]Nacho'],
+'Ignacio':   ['[InTerns]Nacho',
+              'Nacho'],
 'Isaias':    ['[InTerns]Demoxx'],
 'Unknown':   [''],
 
