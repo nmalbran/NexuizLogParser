@@ -2,6 +2,7 @@
 
 import os
 import time
+import copy
 from datetime import datetime, timedelta
 from optparse import OptionParser
 from operator import itemgetter, attrgetter
@@ -180,7 +181,7 @@ class NexuizLogParser:
                         self.games[self.count] = dict()
                         self.games[self.count]['map_data'] = {'map_name': map_name,
                                                               'start_time': gametime + START_DELAY_TIME,
-                                                              'duration': '',
+                                                              'duration': timedelta(),
                                                               'game_type': game_type,
                                                               }
 
@@ -656,7 +657,7 @@ class NexuizLogParser:
         if display_parcial:
             for i, game in self._sorted_games():
                 players = self._filter_players_and_sort_by_stat(game['players'], display_bot)
-                game_data = game['map_data']
+                game_data = copy.deepcopy(game['map_data'])
                 game_data['player_stats'] = self._output_players_scores(render, players, table='game')
                 game_data['player_vs_player'] = self._output_kills_by_player(render, players)
 
