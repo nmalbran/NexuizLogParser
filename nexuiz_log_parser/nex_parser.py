@@ -155,7 +155,7 @@ class NexuizLogParser:
             capture_stack = dict()
             killing_spree = dict()
 
-            for line in open(logfile):
+            for line in open(logfile, 'rb'):
                 line_number += 1
                 self.logline = "%s:%d :" % (logfile, line_number)
 
